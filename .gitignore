@@ -30,3 +30,10 @@ Thumbs.db
 # Build outputs
 dist/
 build/
+node_modules/
+*.exe
+*.zip
+TEST_PORTABLE/
+TEST_EXTRACTION/
+dist/
+build/
