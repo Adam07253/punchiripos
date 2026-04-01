@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Purchase History - Inventory System</title>
+
+<style>
+/* Software-style UI */
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --border-color: #d1d5db;
+  --bg-color: #f8fafc;
+  --card-bg: #ffffff;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --hover-bg: #f3f4f6;
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --table-border: #e5e7eb;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, var(--primary-color), #1e40af);
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.product-id {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+/* Toolbar */
+.toolbar {
+  padding: 12px 24px;
+  background: #f9fafb;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: var(--hover-bg);
+  border-color: #9ca3af;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--text-primary);
+}
+
+.btn-icon {
+  padding: 6px 12px;
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Main content */
+.content {
+  padding: 24px;
+}
+
+/* Loading and error states */
+.status-container {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.error {
+  color: var(--error);
+  background: #fee2e2;
+  padding: 16px;
+  border-radius: 6px;
+  border-left: 4px solid var(--error);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.error svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Table with proper grid lines */
+.table-container {
+  overflow-x: auto;
+  border: 1px solid var(--table-border);
+  border-radius: 6px;
+}
+
+.table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+/* Vertical and horizontal borders for all cells */
+.table th,
+.table td {
+  border-right: 1px solid var(--table-border);
+  border-bottom: 1px solid var(--table-border);
+}
+
+/* Remove right border from last column */
+.table th:last-child,
+.table td:last-child {
+  border-right: none;
+}
+
+/* Remove bottom border from last row */
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table thead {
+  background: #f9fafb;
+}
+
+/* Table Headings - Increased font size by 4px and made bold */
+.table th {
+  padding: 14px 16px; /* Increased padding to accommodate larger font */
+  text-align: center; /* Center aligned */
+  font-weight: 700; /* Bold */
+  color: var(--text-primary);
+  text-transform: uppercase;
+  font-size: 16px; /* Increased from 12px by 4px */
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--table-border);
+}
+
+.table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background: var(--hover-bg);
+}
+
+/* Table Data - Increased font size by 2px, centered, and bold */
+.table td {
+  padding: 14px 16px;
+  color: var(--text-primary);
+  text-align: center; /* Center aligned */
+  font-weight: 600; /* Semi-bold (600) for data */
+  font-size: 15px; /* Increased from 13px by 2px */
+}
+
+/* Numeric columns with monospace font */
+.table td:nth-child(3),
+.table td:nth-child(4),
+.table td:nth-child(5),
+.table td:nth-child(6),
+.table td:nth-child(7) {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-weight: 700; /* Bold for numeric data */
+}
+
+/* Specific column styling adjustments */
+.table td:first-child {
+  color: var(--text-secondary);
+  font-weight: 600; /* Consistent boldness */
+}
+
+.table td:nth-child(2) {
+  font-weight: 600; /* Consistent boldness */
+}
+
+.table td:last-child {
+  color: var(--text-secondary);
+  font-size: 14px; /* Slightly smaller for date but still bold */
+  font-weight: 600;
+}
+
+/* Summary bar */
+.summary-bar {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f0f9ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-label {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.summary-value {
+  font-weight: 700; /* Bold */
+  color: var(--text-primary);
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 14px; /* Increased */
+}
+
+/* Footer */
+.footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  background: #f9fafb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px; /* Increased from 12px */
+  color: var(--text-secondary);
+}
+
+.record-count {
+  font-weight: 700; /* Bold */
+  font-size: 14px; /* Increased */
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  color: var(--border-color);
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  font-size: 16px; /* Increased */
+  font-weight: 600; /* Semi-bold */
+}
+</style>
+
+</head>
+
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <button class="btn btn-icon" onclick="goBack()" title="Go back">
+        <svg fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+      <h1>📦 Purchase History</h1>
+      <div class="product-id" id="productIdDisplay">Product ID: Loading...</div>
+    </div>
+    <div class="header-right">
+      <div style="font-size: 13px; opacity: 0.9;">Inventory Management System</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="actions">
+      <!-- Removed Export CSV, Add Purchase, and Settings buttons as they have no functionality -->
+    </div>
+    <div class="view-options">
+      <button class="btn btn-icon" title="Refresh" onclick="location.reload()">
+        <svg fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <!-- Status Display -->
+    <div id="status" class="status-container">
+      <div class="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading purchase history...</div>
+      </div>
+    </div>
+
+    <!-- Table (hidden by default) -->
+    <div id="tableSection" style="display: none;">
+      <div class="table-container">
+        <table class="table" id="tbl">
+          <thead>
+            <tr>
+              <th>Sl No</th>
+              <th>Product Name</th>
+              <th>Qty</th>
+              <th>Total Purchase ₹</th>
+              <th>Per Unit ₹</th>
+              <th>Retail ₹</th>
+              <th>Wholesale ₹</th>
+              <th>Special ₹</th>
+              <th>Purchase Date</th>
+            </tr>
+          </thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+
+      <!-- Summary Bar -->
+      <div class="summary-bar" id="summaryBar" style="display: none;">
+        <div class="summary-item">
+          <span class="summary-label">Total Purchases</span>
+          <span class="summary-value" id="totalPurchases">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total Quantity</span>
+          <span class="summary-value" id="totalQuantity">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Avg. Unit Price</span>
+          <span class="summary-value" id="avgUnitPrice">₹0.00</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Last Purchase</span>
+          <span class="summary-value" id="lastPurchase">-</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer" id="footer" style="display: none;">
+    <div class="footer-left">
+      <span class="record-count" id="recordCount">0 records</span>
+      <span> • Inventory Management System v2.1</span>
+    </div>
+    <div class="footer-right">
+      <span id="timestamp">Loaded: -</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const productId = params.get("product_id");
+const fromPage = params.get("from");
+
+// Update product ID display
+document.getElementById('productIdDisplay').textContent = `Product ID: ${productId || 'N/A'}`;
+
+// Helper function to format numbers without unnecessary zeros
+function formatNumber(num, decimalPlaces = 2) {
+  // If the number is an integer, show without decimals
+  if (Number.isInteger(num)) {
+    return num.toString();
+  }
+  
+  // Format with specified decimal places
+  let formatted = num.toFixed(decimalPlaces);
+  
+  // Remove trailing zeros
+  formatted = formatted.replace(/(\.\d*?)0+$/, '$1');
+  
+  // If the decimal part is all zeros, remove the decimal point
+  formatted = formatted.replace(/\.$/, '');
+  
+  return formatted;
+}
+
+// Helper function to format date from yyyy-mm-dd to dd-mm-yyyy
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  return dateStr;
+}
+
+if (!productId) {
+  document.getElementById("status").innerHTML = `
+    <div class="error">
+      <svg fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+      </svg>
+      <div>Product ID missing in URL parameters</div>
+    </div>
+  `;
+} else {
+  loadHistory(productId);
+}
+
+async function loadHistory(id) {
+  try {
+    const res = await fetch(`http://localhost:3000/api/purchase-history/${id}`);
+    if (!res.ok) throw new Error("Server error");
+const data = await res.json();
+
+    if (!data.length) {
+      document.getElementById("status").innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <p>No purchase history found for this product</p>
+          <button class="btn btn-secondary" onclick="history.back()">
+            <svg fill="currentColor" viewBox="0 0 20 20" style="width: 14px; height: 14px;">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+            Back to Products
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    const body = document.getElementById("body");
+    body.innerHTML = "";
+
+    let totalQty = 0;
+    let totalPurchase = 0;
+    let latestDate = "";
+
+    data.forEach(r => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r.sl_no}</td>
+        <td>${r.product_name}</td>
+        <td>${formatNumber(r.qty, 0)}</td>
+        <td>₹${formatNumber(r.total_purchase_price, 2)}</td>
+        <td>₹${formatNumber(r.per_unit_purchase_price, 4)}</td>
+        <td>₹${formatNumber(r.retail_price_at_purchase, 2)}</td>
+        <td>₹${formatNumber(r.wholesale_price_at_purchase, 2)}</td>
+        <td>${r.special_price_at_purchase != null ? '₹' + formatNumber(r.special_price_at_purchase, 2) : '-'}</td>
+        <td>${formatDate(r.purchase_date)}</td>
+      `;
+      body.appendChild(tr);
+
+      // Calculate totals for summary
+      totalQty += r.qty;
+      totalPurchase += r.total_purchase_price;
+      if (!latestDate || r.purchase_date > latestDate) {
+        latestDate = r.purchase_date;
+      }
+    });
+
+    // Update summary bar
+    document.getElementById('totalPurchases').textContent = data.length;
+    document.getElementById('totalQuantity').textContent = totalQty;
+    const avg = totalQty > 0 ? totalPurchase / totalQty : 0;
+document.getElementById('avgUnitPrice').textContent = `₹${formatNumber(avg, 2)}`;
+    document.getElementById('lastPurchase').textContent = formatDate(latestDate);
+    
+    // Update footer
+    document.getElementById('recordCount').textContent = `${data.length} purchase records`;
+    document.getElementById('timestamp').textContent = `Loaded: ${new Date().toLocaleTimeString()}`;
+
+    // Show table and related elements
+    document.getElementById("status").style.display = "none";
+    document.getElementById("tableSection").style.display = "block";
+    document.getElementById("summaryBar").style.display = "flex";
+    document.getElementById("footer").style.display = "flex";
+
+  } catch (e) {
+    console.error(e);
+    document.getElementById("status").innerHTML = `
+      <div class="error">
+        <svg fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        <div>Failed to load purchase history. Please check your connection and try again.</div>
+      </div>
+    `;
+  }
+}
+function goBack() {
+  history.back();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "version": "2.1.0",
+  "buildDate": "2026-03-31T15:46:43.150Z",
+  "features": [
+    "Continuous barcode scanning",
+    "Keyboard shortcuts (Ctrl+Q, Ctrl+←/→)",
+    "Mandatory payment flow",
+    "Enhanced stock management",
+    "Barcode uniqueness validation",
+    "Improved backup system (storedb prefix)",
+    "Multi-close backup support",
+    "Enhanced product table sorting"
+  ],
+  "parts": {
+    "part1": "Billing System (6 features)",
+    "part2": "Stock Management (5 features)",
+    "part3": "Product Table (3 features)",
+    "part4": "Backup System (4 features)",
+    "part5": "Testing (64 tests)",
+    "part6": "Documentation (14 docs)",
+    "part7": "Build & Package"
+  }
+}

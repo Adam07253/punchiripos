@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Viewer — Punchiri Stores</title>
+    <style>
+        /* ====== PROFESSIONAL THEME ====== */
+        :root {
+            --color-primary-50: #f0f9ff;
+            --color-primary-100: #e0f2fe;
+            --color-primary-600: #0284c7;
+            --color-primary-700: #0369a1;
+            --color-success-600: #059669;
+            --color-warning-600: #d97706;
+            --color-error-600: #dc2626;
+            --color-gray-50: #f9fafb;
+            --color-gray-100: #f3f4f6;
+            --color-gray-200: #e5e7eb;
+            --color-gray-300: #d1d5db;
+            --color-gray-700: #374151;
+            --color-gray-900: #111827;
+
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --transition-base: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--color-gray-50);
+            color: var(--color-gray-900);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* ========== Main Layout ========== */
+        .dashboard-container {
+            max-width: 80rem; /* 1280px */
+            margin: 0 auto;
+        }
+
+        /* ========== Header ========== */
+        .dashboard-header {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .header-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-gray-900);
+        }
+        .header-title p {
+            color: var(--color-gray-700);
+            font-size: 0.875rem;
+        }
+        .system-badge {
+            background: var(--color-primary-50);
+            color: var(--color-primary-600);
+            padding: 0.375rem 0.875rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid var(--color-primary-100);
+        }
+
+        /* ========== Toolbar ========== */
+        .toolbar-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-gray-200);
+        }
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-gray-700);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .filter-controls {
+            display: flex;
+            gap: 0.75rem;
+        }
+        .form-input {
+            flex: 1;
+            height: 2.5rem;
+            padding: 0 0.75rem;
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            transition: var(--transition-base);
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary-600);
+            box-shadow: 0 0 0 3px var(--color-primary-50);
+        }
+
+        /* ========== Buttons ========== */
+        .btn {
+            padding: 0.625rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-base);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background: var(--color-primary-600);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--color-primary-700);
+        }
+        .btn-secondary {
+            background: white;
+            color: var(--color-gray-700);
+            border: 1px solid var(--color-gray-300);
+        }
+        .btn-secondary:hover {
+            background: var(--color-gray-50);
+        }
+        .btn-success {
+            background: var(--color-success-600);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #047857;
+        }
+        .btn-warning {
+            background: var(--color-warning-600);
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #b45309;
+        }
+        .btn-sm {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        /* ========== Content Area ========== */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+        .results-info {
+            font-size: 0.875rem;
+            color: var(--color-gray-700);
+        }
+        .results-info strong {
+            color: var(--color-gray-900);
+            font-weight: 700;
+        }
+        .current-date {
+            font-size: 0.875rem;
+            color: var(--color-primary-600);
+            font-weight: 600;
+        }
+
+        /* ========== Bills Grid ========== */
+        .bills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+        @media (max-width: 1024px) {
+            .bills-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ========== Bill Card ========== */
+        .bill-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-gray-200);
+            transition: var(--transition-base);
+        }
+        .bill-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary-200);
+        }
+        .bill-card.today {
+            border-left: 4px solid var(--color-success-600);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-gray-100);
+        }
+        .bill-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .bill-number {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--color-gray-900);
+        }
+        .badge {
+            background: var(--color-primary-600);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+        }
+        .badge-edited {
+            background: var(--color-warning-600);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+        }
+        .bill-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--color-gray-700);
+        }
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .bill-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* ========== Bill Preview ========== */
+        .bill-preview-container {
+            background: var(--color-gray-50);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--color-gray-200);
+        }
+        .bill-preview {
+            font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            white-space: pre;
+            background: white;
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-gray-200);
+            overflow-x: auto;
+            max-height: 20rem;
+            overflow-y: auto;
+        }
+        .bill-preview::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .bill-preview::-webkit-scrollbar-track {
+            background: var(--color-gray-100);
+            border-radius: 3px;
+        }
+        .bill-preview::-webkit-scrollbar-thumb {
+            background: var(--color-gray-300);
+            border-radius: 3px;
+        }
+        .bill-preview::-webkit-scrollbar-thumb:hover {
+            background: var(--color-gray-400);
+        }
+
+        /* ========== Bill Summary ========== */
+        .bill-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-gray-200);
+        }
+        .bill-total {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--color-gray-900);
+        }
+        .payment-method {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            background: var(--color-primary-600);
+            padding: 0.375rem 0.75rem;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ========== Status States ========== */
+        .status-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-gray-200);
+        }
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid var(--color-gray-200);
+            border-top-color: var(--color-primary-600);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: var(--color-gray-700);
+            font-size: 0.875rem;
+        }
+        .error-state {
+            background: #fee2e2;
+            border-left: 4px solid var(--color-error-600);
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .error-state svg {
+            color: var(--color-error-600);
+            flex-shrink: 0;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        .empty-icon {
+            width: 4rem;
+            height: 4rem;
+            color: var(--color-gray-300);
+            margin: 0 auto 1rem;
+        }
+
+        /* ========== Footer ========== */
+        .dashboard-footer {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            color: var(--color-gray-700);
+            font-size: 0.75rem;
+            border-top: 1px solid var(--color-gray-200);
+        }
+
+        /* ========== Responsive ========== */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1.25rem;
+            }
+            .toolbar-card {
+                padding: 1.25rem;
+            }
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            .bill-card {
+                padding: 1.25rem;
+            }
+            .card-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            .bill-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+        @media (max-width: 640px) {
+            body {
+                padding: 0.5rem;
+            }
+            .bills-grid {
+                grid-template-columns: 1fr;
+            }
+            .bill-summary {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: flex-start;
+            }
+        }
+        .edited-text {
+    color: var(--color-error-600); /* red */
+    font-weight: 700;
+}
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-icon">🧾</div>
+                <div class="header-title">
+                    <h1>Bill Viewer</h1>
+                    <p>Punchiri Stores • Billing System</p>
+                </div>
+            </div>
+            <div class="system-badge">v2.0</div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="toolbar-card">
+            <div class="quick-actions">
+                <button class="btn btn-primary" id="btnToday">
+                    📅 Today
+                </button>
+                <button class="btn btn-secondary" id="btnYesterday">
+                    📅 Yesterday
+                </button>
+                <button class="btn btn-success" id="btnExportAllBills">
+                    📊 Export All Bills (Excel)
+                </button>
+            </div>
+            
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">📆 Select Date</label>
+                    <div class="filter-controls">
+                        <input type="date" id="billDate" class="form-input">
+                        <button class="btn btn-primary" id="btnLoadDate">
+                            Load
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">🔍 Search Bill</label>
+                    <div class="filter-controls">
+                        <input type="number"
+       id="billNo"
+       class="form-input"
+       placeholder="Enter bill number"
+       min="1"
+       step="1"
+       inputmode="numeric">
+                        <button class="btn btn-primary" id="btnSearchBill">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="content-area">
+            <!-- Status Display -->
+            <div id="status" class="status-container" style="display: none;">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Loading bills...</div>
+            </div>
+
+            <!-- Content Header -->
+            <div id="statusBar" class="content-header" style="display: none;">
+                <div class="results-info">
+                    Showing <strong id="billCount">0</strong> bill(s)
+                </div>
+                <div class="current-date" id="currentDate"></div>
+            </div>
+
+            <!-- Bills Grid -->
+            <div id="list" class="bills-grid"></div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <div>Punchiri Stores Billing System • Version 2.0</div>
+        </footer>
+    </div>
+
+    <!-- Real-time Client -->
+    <script src="realtimeClient.js"></script>
+    
+    <!-- SheetJS Library with Styling Support -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    
+    <!-- ORIGINAL JAVASCRIPT (NO CHANGES) -->
+    <script>
+      console.log("SCRIPT RUNNING");
+
+// Track current view state (MUST BE DECLARED EARLY)
+let currentViewMode = 'date'; // 'date' or 'bill_number'
+let currentDate = null;
+let currentBillNumber = null;
+let currentBills = [];
+
+// ---------- helpers ----------
+function fmt(n) {
+  const num = Number(n || 0);
+  return num
+    .toFixed(2)
+    .replace(/\.00$/, '')
+    .replace(/(\.\d)0$/, '$1');
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[m]));
+}
+function isTodayBill(dateStr) {
+  if (!dateStr) return false;
+  const d = new Date(String(dateStr).replace(" ", "T"));
+  const t = new Date();
+  return d.toDateString() === t.toDateString();
+}
+function formatBillDate(dateStr) {
+  const d = new Date(dateStr);
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+
+  let hh = d.getHours();
+  const min = String(d.getMinutes()).padStart(2, "0");
+  const ampm = hh >= 12 ? "PM" : "AM";
+
+  hh = hh % 12 || 12;
+  hh = String(hh).padStart(2, "0");
+
+  return `${dd}/${mm}/${yyyy}   ${hh}:${min} ${ampm}`;
+}
+function formatMoney(val) {
+  const n = Number(val) || 0;
+  return n
+    .toFixed(2)
+    .replace(/\.00$/, '')
+    .replace(/(\.\d)0$/, '$1');
+}
+function wrapByWords(text, maxWidth) {
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+
+  words.forEach(word => {
+    if ((line + word).length <= maxWidth) {
+      line += (line ? " " : "") + word;
+    } else {
+      lines.push(line);
+      line = word;
+    }
+  });
+
+  if (line) lines.push(line);
+  return lines;
+}
+
+function getEffectiveQty(qty) {
+  return Number(qty);
+}
+
+// ---------- UI init ----------
+const billDateInput = document.getElementById("billDate");
+function setActiveButton(activeBtn) {
+  const btnToday = document.getElementById("btnToday");
+  const btnYesterday = document.getElementById("btnYesterday");
+
+  // Reset both
+  btnToday.classList.remove("btn-primary");
+  btnToday.classList.add("btn-secondary");
+
+  btnYesterday.classList.remove("btn-primary");
+  btnYesterday.classList.add("btn-secondary");
+
+  // Activate selected
+  activeBtn.classList.remove("btn-secondary");
+  activeBtn.classList.add("btn-primary");
+}
+const todayStr = new Date().toISOString().split("T")[0];
+billDateInput.value = todayStr;
+billDateInput.max = todayStr;
+// Show loading state initially
+document.getElementById("status").style.display = "block";
+updateStatusBar(todayStr);
+
+loadBillsByDate(todayStr);
+setActiveButton(document.getElementById("btnToday"));
+
+document.getElementById("btnToday").onclick = () => {
+  setActiveButton(document.getElementById("btnToday"));
+
+  billDateInput.value = todayStr;
+  document.getElementById("status").style.display = "block";
+  updateStatusBar(todayStr);
+  loadBillsByDate(todayStr);
+};
+
+document.getElementById("btnYesterday").onclick = () => {
+  setActiveButton(document.getElementById("btnYesterday"));
+
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const y = d.toISOString().split("T")[0];
+
+  billDateInput.value = y;
+  document.getElementById("status").style.display = "block";
+  updateStatusBar(y);
+  loadBillsByDate(y);
+};
+
+document.getElementById("btnLoadDate").onclick = () => {
+  if (!billDateInput.value) {
+    alert("Choose a date");
+    return;
+  }
+  document.getElementById("status").style.display = "block";
+  updateStatusBar(billDateInput.value);
+  loadBillsByDate(billDateInput.value);
+};
+
+document.getElementById("btnSearchBill").onclick = () => {
+  const id = Number(document.getElementById("billNo").value);
+  if (!id) {
+    alert("Enter bill no");
+    return;
+  }
+  document.getElementById("status").style.display = "block";
+  updateStatusBar(`Bill #${id}`);
+  loadBillByNumber(id);
+};
+const billNoInput = document.getElementById("billNo");
+
+billNoInput.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    document.getElementById("btnSearchBill").click();
+  }
+});
+billNoInput.addEventListener("input", function() {
+  this.value = this.value.replace(/[^0-9]/g, "");
+});
+// Update status bar
+function updateStatusBar(dateInfo) {
+  const dateDisplay = document.getElementById("currentDate");
+  if (dateInfo === todayStr) {
+    dateDisplay.textContent = "Today";
+  } else if (typeof dateInfo === 'string' && dateInfo.includes('-')) {
+    const date = new Date(dateInfo);
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    dateDisplay.textContent = date.toLocaleDateString('en-US', options);
+  } else {
+    dateDisplay.textContent = dateInfo;
+  }
+}
+
+// ---------- API ----------
+async function loadBillsByDate(dateStr){
+  // Track current view
+  currentViewMode = 'date';
+  currentDate = dateStr;
+  currentBillNumber = null;
+  
+  try {
+    const res = await fetch(
+      `http://localhost:3000/bills/full?from=${dateStr}&to=${dateStr}`
+    );
+
+    if (!res.ok) throw new Error("Server error");
+
+    const bills = await res.json();
+    currentBills = bills; // Store for comparison
+    renderBills(bills);
+    document.getElementById("status").style.display = "none";
+    document.getElementById("statusBar").style.display = "flex";
+
+  } catch (e) {
+    document.getElementById("list").innerHTML = `
+      <div class="error-state">
+        <svg fill="currentColor" viewBox="0 0 20 20" width="24" height="24">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        <div>Failed to load bills. Please check your connection and try again.</div>
+      </div>
+    `;
+    document.getElementById("status").style.display = "none";
+    document.getElementById("statusBar").style.display = "flex";
+    document.getElementById("billCount").textContent = "0";
+  }
+}
+
+async function loadBillByNumber(no){
+  // Track current view
+  currentViewMode = 'bill_number';
+  currentBillNumber = no;
+  currentDate = null;
+  
+  try {
+    const res = await fetch(
+      `http://localhost:3000/bills/full?bill_no=${no}`
+    );
+
+    if (!res.ok) throw new Error("Server error");
+
+    const bills = await res.json();
+    console.log("BILLS FROM SERVER:", bills);
+    currentBills = bills; // Store for comparison
+    renderBills(bills);
+    document.getElementById("status").style.display = "none";
+    document.getElementById("statusBar").style.display = "flex";
+
+  } catch (e) {
+    document.getElementById("list").innerHTML = `
+      <div class="error-state">
+        <svg fill="currentColor" viewBox="0 0 20 20" width="24" height="24">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        <div>Failed to load bill. Please check the bill number and try again.</div>
+      </div>
+    `;
+    document.getElementById("status").style.display = "none";
+    document.getElementById("statusBar").style.display = "flex";
+    document.getElementById("billCount").textContent = "0";
+  }
+}
+
+// ---------- render ----------
+function renderBills(bills){
+  const wrap = document.getElementById("list");
+  wrap.innerHTML = "";
+
+  if (!bills || !bills.length){
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg fill="currentColor" viewBox="0 0 20 20" width="64" height="64">
+            <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <h3>No bills found</h3>
+        <p>No bills were found for the selected criteria.</p>
+        <button class="btn btn-primary" onclick="document.getElementById('btnToday').click()">
+          View Today's Bills
+        </button>
+      </div>
+    `;
+    document.getElementById("billCount").textContent = "0";
+    return;
+  }
+
+  document.getElementById("billCount").textContent = bills.length;
+
+  const LINE_WIDTH = 36;
+  const LINE = "-".repeat(LINE_WIDTH);
+  const W_NO    = 3;
+  const NAME_W  = 18;
+  const QTY_W   = 4;
+  const RATE_W  = 6;
+  const TOTAL_W = 6;
+
+  const header =
+    "No".padEnd(W_NO) +
+    "Item".padEnd(NAME_W) +
+    "Qty".padStart(QTY_W) +
+    "Rate".padStart(RATE_W) +
+    "Total".padStart(TOTAL_W);
+
+  bills.forEach(b => {
+    let body = "";
+    const grouped = {};
+
+    (b.items || []).forEach(it => {
+      const key = it.name + "|" + it.unit + "|" + it.price;
+      if (!grouped[key]) {
+        grouped[key] = { name: it.name, unit: it.unit, qty: 0, rate: it.price };
+      }
+      grouped[key].qty += Number(it.qty);
+    });
+
+    let viewSubtotal = 0;
+    let rowNo = 1;
+
+    for (const key in grouped) {
+      const g = grouped[key];
+      const nameParts = wrapByWords(g.name.toUpperCase(), NAME_W);
+
+      let qtyStr = "";
+      if (g.unit === "pc") {
+        qtyStr = String(Math.round(g.qty));
+      } else {
+        qtyStr = g.qty < 1
+          ? Math.round(g.qty * 1000) + "g"
+          : Number.isInteger(g.qty) ? String(g.qty) : String(Number(g.qty.toFixed(3)));
+      }
+
+      const rateStr = fmt(g.rate);
+      const itemTotal = Math.ceil(g.qty * g.rate);
+      viewSubtotal += itemTotal;
+
+      body +=
+        (rowNo + ".").padEnd(W_NO) +
+        nameParts[0].padEnd(NAME_W) +
+        qtyStr.padStart(QTY_W) +
+        rateStr.padStart(RATE_W) +
+        String(itemTotal).padStart(TOTAL_W) +
+        "\n";
+
+      for (let r = 1; r < nameParts.length; r++) {
+        body += "  " + nameParts[r].padEnd(NAME_W) + "\n";
+      }
+      rowNo++;
+    }
+
+    const paymentLine =
+      (`Payment : ${(b.payment_mode || "").toUpperCase()} |  SUBTOTAL : ₹${viewSubtotal}`)
+      .padEnd(36, " ");
+
+    const div = document.createElement("div");
+    div.className = `bill-card ${isTodayBill(b.date) ? 'today' : ''}`;
+    
+    const formattedDate = formatBillDate(b.date);
+    const isToday = isTodayBill(b.date);
+    
+    let buttons = `
+  <button class="btn btn-success btn-sm print-btn" data-bill='${escapeHtml(JSON.stringify(b))}'>
+  Print
+</button>
+`;
+
+    if (isToday) {
+      buttons += `
+        <button class="btn btn-warning btn-sm" onclick="editBill(${b.id})">
+          Edit
+        </button>
+      `;
+    }
+
+    div.innerHTML = `
+      <div class="card-header">
+        <div class="bill-meta">
+          <div class="bill-number">
+            Bill #${b.id}
+            ${isToday ? '<span class="badge">Today</span>' : ''}
+            ${Number(b.is_edited) === 1 ? '<span class="edited-text">Edited</span>' : ''}
+          </div>
+          <div class="bill-details">
+            <div class="detail-item">${formattedDate}</div>
+            <div class="detail-item">${(b.payment_mode || "").toUpperCase()}</div>
+            ${b.customer_id ? `
+              <div class="detail-item">OB: ₹${fmt(b.previous_ob || 0)}</div>
+              <div class="detail-item">Paid: ₹${fmt(b.paid_amount || 0)}</div>
+              <div class="detail-item">Balance: ₹${fmt(b.new_ob || 0)}</div>
+            ` : ""}
+          </div>
+          ${b.is_edited && b.edited_at
+  ? `<div class="detail-item edited-text">
+      Edited at ${formatBillDate(b.edited_at)}
+    </div>`
+  : ''
+}
+        </div>
+        <div class="bill-actions">
+          ${buttons}
+        </div>
+      </div>
+      <div class="bill-preview-container">
+        <div class="bill-preview">${buildPreviewBill(b)}</div>
+      </div>
+      <div class="bill-summary">
+        <div class="bill-total">Total Amount: ₹${viewSubtotal}</div>
+        <div class="payment-method">${(b.payment_mode || "").toUpperCase()}</div>
+      </div>
+    `;
+    
+    wrap.appendChild(div);
+    div.querySelector(".print-btn").addEventListener("click", function() {
+  const billData = JSON.parse(this.getAttribute("data-bill"));
+  printFromView(billData);
+});
+  });
+}
+function buildPreviewBill(b) {
+  const LINE_WIDTH = 36;
+  const LINE = "-".repeat(LINE_WIDTH);
+
+  const W_NO = 3;
+  const W_ITEM = 18;
+  const W_QTY = 4;
+  const W_RATE = 6;
+  const W_TOTAL = 6;
+
+  function formatQty(qty, unit) {
+    if (unit === "pc") return String(Math.round(qty));
+    if (qty < 1) return Math.round(qty * 1000) + "g";
+    return Number.isInteger(qty) ? String(qty) : String(qty.toFixed(2));
+  }
+
+  let body = "";
+  let printSubtotal = 0;
+  let rowNo = 1;
+
+  (b.items || []).forEach(it => {
+    const qty = formatQty(it.qty, it.unit);
+    const rate = fmt(it.price);
+    const total = Math.ceil(Number(it.qty) * Number(it.price));
+    printSubtotal += total;
+
+    body +=
+      (rowNo + ".").padEnd(W_NO + 1) +
+      it.name.toUpperCase().padEnd(W_ITEM) +
+      qty.padStart(W_QTY) +
+      rate.padStart(W_RATE) +
+      String(total).padStart(W_TOTAL) +
+      "\n";
+
+    rowNo++;
+  });
+
+const obBlock = b.customer_id ? `
+${LINE}
+OB : ₹${fmt(b.previous_ob || 0)}
+Paid Now : ₹${fmt(b.paid_amount || 0)}
+Balance Due : ₹${fmt(b.new_ob || 0)}
+` : "";
+
+return `
+ESTIMATE
+${LINE}
+Bill No: ${b.id}
+Date : ${formatBillDate(b.date)}
+${LINE}
+No Item${" ".repeat(W_ITEM - 4)}Qty Rate Total
+${LINE}
+${body}${LINE}
+SUBTOTAL : ₹${printSubtotal}
+${obBlock}
+${LINE}
+Thank You!
+`.trim();
+}
+function editBill(billId) {
+  // go to billing screen in EDIT mode
+  window.location.href = `/billing_v2.html?edit_bill=${billId}`;
+}
+
+function printFromView(b) {
+
+  const billObj = {
+    items: [],
+    subtotal: 0,
+    previousOB: 0,
+    paidNow: 0,
+    billTotal: 0,
+    newOB: 0,
+    customerName: b.customer_name ? b.customer_name : "CASH CUSTOMER"
+  };
+
+  // rebuild items EXACTLY like billing page
+  (b.items || []).forEach(it => {
+    billObj.items.push({
+      product_id: it.product_id,
+      name: it.name,
+      qty: Number(it.qty),
+      unit: it.unit,
+      unitPrice: Number(it.price),
+      total: Math.ceil(Number(it.qty) * Number(it.price))
+    });
+  });
+
+  billObj.subtotal = billObj.items.reduce((s, it) => s + it.total, 0);
+  billObj.billTotal = billObj.subtotal;
+
+billObj.previousOB = Number(b.previous_ob || 0);
+billObj.paidNow = Number(b.paid_amount || 0);
+billObj.newOB = Number(b.new_ob || 0);   // ✅ USE DB VALUE
+
+  // 🔥 CALL SAME PRINT ENGINE
+  doPrint(billObj, b.id);
+}
+function doPrint(billObj, billId) {
+  
+  const billNo = billId || 1;
+  const d = new Date();
+  const dateStr = d.toLocaleDateString("en-IN");
+  const timeStr = d.toLocaleTimeString("en-IN", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  });
+
+  // 40-character line (for 80mm)
+  const LINE_WIDTH = 36;
+  const LINE = "-".repeat(LINE_WIDTH);
+  const W_NO    = 3; 
+  const W_ITEM  = 18;  
+  const W_QTY   = 4;   
+  const W_RATE  = 6; 
+  const W_TOTAL = 6; 
+  const headerLine =
+    "No".padEnd(W_NO) +
+    "Item".padEnd(W_ITEM) +
+    "Qty".padStart(W_QTY) +
+    "Rate".padStart(W_RATE) +
+    "Total".padStart(W_TOTAL);
+  
+  function formatQty(it) {
+    if (it.unit === "pc") {
+      return String(Math.round(it.qty));
+    }
+    if (it.qty < 1) {
+      return Math.round(it.qty * 1000) + "g";
+    }
+    return Number.isInteger(it.qty)
+      ? String(it.qty)
+      : String(Number(it.qty.toFixed(3)));
+  }
+  
+  let body = "";
+  billObj.items.forEach((it, i) => {
+    const no = (i + 1 + ".").padEnd(W_NO);
+
+    const nameWidth = W_ITEM - W_NO;
+
+    const nameLines = wrapByWords(
+      it.name.toUpperCase(),
+      nameWidth
+    );
+    const qty  = String(formatQty(it)).padStart(W_QTY);
+    const rate = formatMoney(it.unitPrice).padStart(W_RATE);
+    const tot  = formatMoney(it.total).padStart(W_TOTAL);
+
+    // ✅ FIRST LINE → name + qty + rate + total
+    body +=
+      no +
+      nameLines[0].padEnd(W_ITEM) +
+      qty +
+      rate +
+      tot +
+      "\n";
+
+    // ✅ EXTRA LINES → ONLY name (NO qty/rate/total)
+    for (let r = 1; r < nameLines.length; r++) {
+      body +=
+        " ".repeat(W_NO) +
+        nameLines[r].padEnd(W_ITEM) +
+        "\n";
+    }
+  });
+  
+  const label = "SUBTOTAL : ₹";
+  const amount = formatMoney(billObj.subtotal);
+
+  // align amount exactly under TOTAL column
+  const totalColumnEnd = W_NO + W_ITEM + W_QTY + W_RATE + W_TOTAL;
+
+  const paymentSubtotalLine =
+  " ".repeat(Math.max(0, totalColumnEnd - (label.length + amount.length))) +
+  label +
+  amount;
+  
+  // ================= OB PRINT BLOCK =================
+  const prevOBStr   = formatMoney(billObj.previousOB || 0);
+  const finalBalStr = formatMoney((billObj.previousOB || 0) + (billObj.billTotal || 0));
+  const paidNowStr  = formatMoney(billObj.paidNow || 0);
+  const dueStr      = formatMoney(billObj.newOB || 0);
+
+  let obPrintBlock = "";
+
+  if (billObj.previousOB !== 0 || billObj.paidNow !== 0) {
+    obPrintBlock =
+`${LINE}
+OB : ₹${prevOBStr} | Final Balance : ₹${finalBalStr}
+Paid Now : ₹${paidNowStr}
+${LINE}
+Balance Due : ₹${dueStr}`;
+  }
+  
+  function center(text, width) {
+    if (text.length >= width) return text;
+    const left = Math.floor((width - text.length) / 2);
+    return " ".repeat(left) + text;
+  }
+  
+  const printable =
+`${center("ESTIMATE", LINE_WIDTH)}
+${LINE}
+Bill No: ${billNo}
+${billObj.customerName !== "CASH CUSTOMER" ? "Customer Name : " + billObj.customerName + "\n" : ""}Date : ${dateStr} | Time : ${timeStr}
+${LINE}
+${headerLine}
+${LINE}
+${body}${LINE}
+${paymentSubtotalLine}${obPrintBlock ? "\n" + obPrintBlock : ""}
+${LINE}
+${center("Thank You!", LINE_WIDTH)}
+`;
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.width = "0";
+  iframe.style.height = "0";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Print</title>
+<style>
+@page { margin: 0; size: 80mm auto; }
+body { margin: 0; font-family: monospace; }
+pre {
+  width: 74mm;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1.25;
+  padding-left: 2mm;
+  margin: 0 auto;
+  white-space: pre-wrap;
+}
+</style>
+</head>
+<body>
+<pre>${escapeHtml(printable)}</pre>
+</body>
+</html>
+  `);
+  doc.close();
+
+  iframe.onload = () => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(() => document.body.removeChild(iframe), 300);
+  };
+}
+
+/* ========================================
+   REAL-TIME UPDATES FOR VIEW BILLS
+======================================== */
+
+// Initialize real-time updates
+function initRealtimeUpdates() {
+  // Listen for bill created events
+  window.realtimeClient.on('bill:created', (data) => {
+    console.log('Real-time: Bill created', data);
+    handleBillCreated(data);
+  });
+  
+  // Listen for bill updated events
+  window.realtimeClient.on('bill:updated', (data) => {
+    console.log('Real-time: Bill updated', data);
+    handleBillUpdated(data);
+  });
+  
+  // Listen for bill deleted events (if implemented)
+  window.realtimeClient.on('bill:deleted', (data) => {
+    console.log('Real-time: Bill deleted', data);
+    handleBillDeleted(data);
+  });
+  
+  console.log('✓ Real-time updates initialized for view-bills');
+}
+
+// Handle new bill created
+async function handleBillCreated(data) {
+  // Only update if we're viewing by date
+  if (currentViewMode !== 'date' || !currentDate) return;
+  
+  // Check if the new bill matches current date filter
+  const billDate = new Date(data.date).toISOString().split('T')[0];
+  
+  if (billDate === currentDate) {
+    // Reload bills for current date
+    await loadBillsByDate(currentDate);
+    
+    // Show notification
+    showNotification('New bill created', 'success');
+  }
+}
+
+// Handle bill updated
+async function handleBillUpdated(data) {
+  // Check if we're viewing this specific bill
+  if (currentViewMode === 'bill_number' && data.bill_id === currentBillNumber) {
+    await loadBillByNumber(currentBillNumber);
+    showNotification('Bill updated', 'info');
+    return;
+  }
+  
+  // Check if we're viewing by date and this bill is in current view
+  if (currentViewMode === 'date' && currentDate) {
+    const billDate = new Date(data.date).toISOString().split('T')[0];
+    
+    if (billDate === currentDate) {
+      await loadBillsByDate(currentDate);
+      showNotification('Bill updated', 'info');
+    }
+  }
+}
+
+// Handle bill deleted
+async function handleBillDeleted(data) {
+  // Check if we're viewing this specific bill
+  if (currentViewMode === 'bill_number' && data.bill_id === currentBillNumber) {
+    document.getElementById("list").innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>Bill Deleted</h3>
+        <p>This bill has been deleted.</p>
+        <button class="btn btn-primary" onclick="document.getElementById('btnToday').click()">
+          View Today's Bills
+        </button>
+      </div>
+    `;
+    showNotification('Bill deleted', 'warning');
+    return;
+  }
+  
+  // Reload current view
+  if (currentViewMode === 'date' && currentDate) {
+    await loadBillsByDate(currentDate);
+    showNotification('Bill deleted', 'warning');
+  }
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    background: ${type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10000;
+    font-weight: 600;
+    animation: slideIn 0.3s ease;
+  `;
+  notification.textContent = message;
+  
+  // Add animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(400px); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  document.body.appendChild(notification);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 300);
+  }, 3000);
+}
+
+// Initialize on page load
+initRealtimeUpdates();
+
+/* ========================================
+   EXPORT ALL BILLS TO EXCEL
+======================================== */
+
+document.getElementById("btnExportAllBills").onclick = async () => {
+  const btn = document.getElementById("btnExportAllBills");
+  const originalText = btn.textContent;
+  
+  try {
+    // Show loading state
+    btn.textContent = "⏳ Exporting...";
+    btn.disabled = true;
+    
+    // Check if XLSX library is loaded
+    if (typeof XLSX === 'undefined') {
+      throw new Error("Excel library not loaded. Please refresh the page.");
+    }
+    
+    console.log("Fetching bills from server...");
+    
+    // Fetch all bills from the server
+    const res = await fetch("http://localhost:3000/bills/all-for-export");
+    
+    console.log("Response status:", res.status);
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Server error:", errorText);
+      
+      // Check if it's a 404 (endpoint not found)
+      if (res.status === 404) {
+        throw new Error("Server needs to be restarted. Please restart the server (node server.js) and try again.");
+      }
+      
+      throw new Error(`Server error: ${res.status}`);
+    }
+    
+    const bills = await res.json();
+    console.log("Bills received:", bills.length);
+    
+    if (!bills || bills.length === 0) {
+      alert("No bills found to export");
+      btn.textContent = originalText;
+      btn.disabled = false;
+      return;
+    }
+    
+    // Convert bills to simple format matching the sample
+    console.log("Converting to Excel format...");
+    const { data, merges, styles } = createSimpleBillsReport(bills);
+    
+    // Create workbook with single sheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    
+    // Set column widths
+    ws['!cols'] = [
+      { wch: 10 },  // Bill No
+      { wch: 10 },  // Time
+      { wch: 20 },  // Product Name
+      { wch: 8 },   // Qty
+      { wch: 10 },  // Rate
+      { wch: 18 },  // Total Number of product
+      { wch: 15 },  // Total amount
+      { wch: 15 },  // Payment method
+      { wch: 25 },  // Total product no of product in whole day
+      { wch: 18 }   // Total sumup of the day
+    ];
+    
+    // Apply cell merges
+    if (merges && merges.length > 0) {
+      ws['!merges'] = merges;
+    }
+    
+    // Apply styles
+    applyStylesToWorksheet(ws, styles);
+    
+    // Add single sheet
+    XLSX.utils.book_append_sheet(wb, ws, "Bills Report");
+    
+    // Generate filename
+    const now = new Date();
+    const dateStr = `${now.getDate().toString().padStart(2, '0')}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getFullYear()}`;
+    const filename = `All_Bills_Report_${dateStr}.xlsx`;
+    
+    console.log("Downloading file:", filename);
+    
+    // Download the file with styles
+    XLSX.writeFile(wb, filename);
+    
+    showNotification(`Exported ${bills.length} bills successfully!`, 'success');
+    
+  } catch (error) {
+    console.error("Export error:", error);
+    alert("Failed to export bills. " + error.message);
+  } finally {
+    // Restore button state
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+};
+
+// ========================================
+// CREATE SIMPLE BILLS REPORT (MATCHING SAMPLE)
+// ========================================
+function createSimpleBillsReport(bills) {
+  const data = [];
+  const merges = [];
+  const styles = [];
+  let currentRow = 0;
+  
+  // Add header row
+  data.push([
+    'Bill No',
+    'Time',
+    'Product Name',
+    'Qty',
+    'Rate',
+    'Total Number of product',
+    'Toatl amount',
+    'Payment methode',
+    'Total product no of product in whole day',
+    'Total sumup of the day'
+  ]);
+  styles.push({ row: currentRow, type: 'mainHeader' });
+  currentRow++;
+  
+  // Group bills by date
+  const billsByDate = {};
+  bills.forEach(bill => {
+    const billDate = new Date(bill.date);
+    const dateKey = `${billDate.getFullYear()}-${String(billDate.getMonth() + 1).padStart(2, '0')}-${String(billDate.getDate()).padStart(2, '0')}`;
+    
+    if (!billsByDate[dateKey]) {
+      billsByDate[dateKey] = [];
+    }
+    billsByDate[dateKey].push(bill);
+  });
+  
+  // Sort dates
+  const sortedDates = Object.keys(billsByDate).sort();
+  
+  let grandTotalQty = 0;
+  let grandTotalAmount = 0;
+  
+  // Process each date
+  sortedDates.forEach((dateKey, dateIndex) => {
+    const dateBills = billsByDate[dateKey];
+    const dateObj = new Date(dateKey);
+    const dd = String(dateObj.getDate()).padStart(2, '0');
+    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const yyyy = dateObj.getFullYear();
+    const dateStr = `${dd}/${mm}/${yyyy}`;
+    
+    // Calculate daily totals
+    let dailyTotalQty = 0;
+    let dailyTotalAmount = 0;
+    
+    dateBills.forEach(bill => {
+      if (bill.items) {
+        bill.items.forEach(item => {
+          const qty = Number(item.qty);
+          const rate = Number(item.price);
+          const total = Math.ceil(qty * rate);
+          dailyTotalQty += qty;
+          dailyTotalAmount += total;
+        });
+      }
+    });
+    
+    grandTotalQty += dailyTotalQty;
+    grandTotalAmount += dailyTotalAmount;
+    
+    // Track the start row for daily totals merging
+    const dailyTotalsStartRow = currentRow;
+    
+    // DATE ROW - spans columns C, D, E (Product Name, Qty, Rate)
+    data.push(['', '', `date(${dateStr})`, '', '', '', '', '', '', '']);
+    styles.push({ row: currentRow, type: 'dateHeader' });
+    merges.push({ s: { r: currentRow, c: 2 }, e: { r: currentRow, c: 4 } }); // Merge C-E
+    currentRow++;
+    
+    // Process each bill
+    dateBills.forEach((bill, billIndex) => {
+      const billDate = new Date(bill.date);
+      let hh = billDate.getHours();
+      const min = String(billDate.getMinutes()).padStart(2, '0');
+      hh = String(hh).padStart(2, '0');
+      const timeStr = `${hh}:${min}`;
+      const paymentMode = (bill.payment_mode || "CASH").toLowerCase();
+      
+      // Calculate bill totals
+      let billTotalQty = 0;
+      let billTotalAmount = 0;
+      
+      if (bill.items) {
+        bill.items.forEach(item => {
+          const qty = Number(item.qty);
+          const rate = Number(item.price);
+          const total = Math.ceil(qty * rate);
+          billTotalQty += qty;
+          billTotalAmount += total;
+        });
+      }
+      
+      const billStartRow = currentRow;
+      const itemCount = bill.items ? bill.items.length : 0;
+      
+      // Process products
+      if (bill.items && bill.items.length > 0) {
+        bill.items.forEach((item, idx) => {
+          const qty = Number(item.qty);
+          const rate = Number(item.price);
+          
+          if (idx === 0) {
+            // First product row - show bill info and totals
+            data.push([
+              bill.id,
+              timeStr,
+              item.name,
+              qty,
+              `${rate}rs`,
+              billTotalQty,
+              `${billTotalAmount}rs`,
+              paymentMode,
+              billIndex === 0 ? `${dailyTotalQty} product` : '',
+              billIndex === 0 ? `${dailyTotalAmount}rs` : ''
+            ]);
+          } else {
+            // Subsequent product rows - empty bill info columns
+            data.push([
+              '',
+              '',
+              item.name,
+              qty,
+              `${rate}rs`,
+              '',
+              '',
+              '',
+              '',
+              ''
+            ]);
+          }
+          
+          styles.push({ row: currentRow, type: 'dataRow' });
+          currentRow++;
+        });
+        
+        // Merge Bill No (column A) for all products in this bill
+        if (itemCount > 1) {
+          merges.push({ s: { r: billStartRow, c: 0 }, e: { r: billStartRow + itemCount - 1, c: 0 } });
+        }
+        
+        // Merge Time (column B) for all products in this bill
+        if (itemCount > 1) {
+          merges.push({ s: { r: billStartRow, c: 1 }, e: { r: billStartRow + itemCount - 1, c: 1 } });
+        }
+        
+        // Merge Total Number of product (column F) for all products in this bill
+        if (itemCount > 1) {
+          merges.push({ s: { r: billStartRow, c: 5 }, e: { r: billStartRow + itemCount - 1, c: 5 } });
+        }
+        
+        // Merge Total amount (column G) for all products in this bill
+        if (itemCount > 1) {
+          merges.push({ s: { r: billStartRow, c: 6 }, e: { r: billStartRow + itemCount - 1, c: 6 } });
+        }
+        
+        // Merge Payment method (column H) for all products in this bill
+        if (itemCount > 1) {
+          merges.push({ s: { r: billStartRow, c: 7 }, e: { r: billStartRow + itemCount - 1, c: 7 } });
+        }
+      }
+    });
+    
+    // Merge daily totals (columns I & J) for all bills in this date
+    const dailyTotalsEndRow = currentRow - 1;
+    if (dailyTotalsEndRow > dailyTotalsStartRow) {
+      merges.push({ s: { r: dailyTotalsStartRow + 1, c: 8 }, e: { r: dailyTotalsEndRow, c: 8 } }); // Column I
+      merges.push({ s: { r: dailyTotalsStartRow + 1, c: 9 }, e: { r: dailyTotalsEndRow, c: 9 } }); // Column J
+    }
+  });
+  
+  // GRAND TOTAL ROW
+  data.push(['', '', '', '', '', '', 'TOTAL=', '', `${grandTotalQty} product`, `${grandTotalAmount}rs`]);
+  styles.push({ row: currentRow, type: 'totalRow' });
+  currentRow++;
+  
+  return { data, merges, styles };
+}
+
+// ========================================
+// APPLY STYLES TO WORKSHEET (LIGHT COLORS)
+// ========================================
+function applyStylesToWorksheet(ws, styles) {
+  styles.forEach(style => {
+    const numCols = 10; // Fixed 10 columns
+    
+    // Apply styles to all cells in the row
+    for (let col = 0; col < numCols; col++) {
+      const cellRef = XLSX.utils.encode_cell({ r: style.row, c: col });
+      
+      if (!ws[cellRef]) {
+        ws[cellRef] = { t: 's', v: '' };
+      }
+      
+      // Apply style based on type
+      switch (style.type) {
+        case 'mainHeader':
+          // Main header row - slightly darker grey, bold
+          ws[cellRef].s = {
+            font: { bold: true, sz: 10, color: { rgb: "000000" } },
+            fill: { patternType: "solid", fgColor: { rgb: "D9D9D9" } },
+            alignment: { horizontal: "center", vertical: "center", wrapText: true },
+            border: {
+              top: { style: "thin", color: { rgb: "000000" } },
+              bottom: { style: "thin", color: { rgb: "000000" } },
+              left: { style: "thin", color: { rgb: "000000" } },
+              right: { style: "thin", color: { rgb: "000000" } }
+            }
+          };
+          break;
+          
+        case 'dateHeader':
+          // Date row - light grey, centered, spans columns C-E
+          ws[cellRef].s = {
+            font: { bold: true, sz: 11, color: { rgb: "000000" } },
+            fill: { patternType: "solid", fgColor: { rgb: "F2F2F2" } },
+            alignment: { horizontal: "center", vertical: "center" },
+            border: {
+              top: { style: "thin", color: { rgb: "CCCCCC" } },
+              bottom: { style: "thin", color: { rgb: "CCCCCC" } },
+              left: { style: "thin", color: { rgb: "CCCCCC" } },
+              right: { style: "thin", color: { rgb: "CCCCCC" } }
+            }
+          };
+          break;
+          
+        case 'dataRow':
+          // Clean data rows with proper alignment
+          let horizontalAlign = "left";
+          
+          // Column-specific alignment
+          if (col === 0) {
+            // Bill No - center and vertical center (for merged cells)
+            horizontalAlign = "center";
+          } else if (col === 1) {
+            // Time - center and vertical center (for merged cells)
+            horizontalAlign = "center";
+          } else if (col === 3 || col === 4) {
+            // Qty, Rate - center
+            horizontalAlign = "center";
+          } else if (col === 5 || col === 6) {
+            // Total Number, Total amount - center and vertical center (for merged cells)
+            horizontalAlign = "center";
+          } else if (col === 7) {
+            // Payment method - center and vertical center (for merged cells)
+            horizontalAlign = "center";
+          } else if (col === 8 || col === 9) {
+            // Daily totals - center and vertical center (for merged cells)
+            horizontalAlign = "center";
+          }
+          
+          ws[cellRef].s = {
+            font: { sz: 10, color: { rgb: "000000" } },
+            alignment: { 
+              horizontal: horizontalAlign, 
+              vertical: "center" // Vertical center for all cells (important for merged cells)
+            },
+            border: {
+              top: { style: "thin", color: { rgb: "EEEEEE" } },
+              bottom: { style: "thin", color: { rgb: "EEEEEE" } },
+              left: { style: "thin", color: { rgb: "EEEEEE" } },
+              right: { style: "thin", color: { rgb: "EEEEEE" } }
+            }
+          };
+          break;
+          
+        case 'totalRow':
+          // Grand total row - light green
+          ws[cellRef].s = {
+            font: { bold: true, sz: 11, color: { rgb: "000000" } },
+            fill: { patternType: "solid", fgColor: { rgb: "E2EFDA" } },
+            alignment: { 
+              horizontal: "center", 
+              vertical: "center" 
+            },
+            border: {
+              top: { style: "thin", color: { rgb: "000000" } },
+              bottom: { style: "thin", color: { rgb: "000000" } },
+              left: { style: "thin", color: { rgb: "000000" } },
+              right: { style: "thin", color: { rgb: "000000" } }
+            }
+          };
+          break;
+          
+        default:
+          // Default clean styling
+          ws[cellRef].s = {
+            alignment: { horizontal: "left", vertical: "center" },
+            border: {
+              top: { style: "thin", color: { rgb: "EEEEEE" } },
+              bottom: { style: "thin", color: { rgb: "EEEEEE" } },
+              left: { style: "thin", color: { rgb: "EEEEEE" } },
+              right: { style: "thin", color: { rgb: "EEEEEE" } }
+            }
+          };
+      }
+    }
+  });
+}
+    </script>
+</body>
+</html>

@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management System | Punchiri Stores</title>
+
+    <style>
+        /* ====== SOFTWARE COMPANY UI THEME ====== */
+        :root {
+            /* Professional Enterprise Color Palette */
+            --primary-50: #f0f9ff;
+            --primary-100: #e0f2fe;
+            --primary-200: #bae6fd;
+            --primary-300: #7dd3fc;
+            --primary-400: #38bdf8;
+            --primary-500: #0ea5e9;
+            --primary-600: #0284c7;
+            --primary-700: #0369a1;
+            --primary-800: #075985;
+            --primary-900: #0c4a6e;
+
+            --success-500: #10b981;
+            --warning-500: #f59e0b;
+            --error-500: #ef4444;
+            --info-500: #3b82f6;
+
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+
+            --surface-0: #ffffff;
+            --surface-50: #f8fafc;
+            --surface-100: #f1f5f9;
+            --surface-200: #e2e8f0;
+
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ====== BASE RESET ====== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--gray-800);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* ====== LAYOUT CONTAINER ====== */
+        .enterprise-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ====== ENTERPRISE HEADER ====== */
+        .enterprise-header {
+            background: var(--surface-0);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enterprise-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-500), var(--primary-700));
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-icon-container {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-icon {
+            font-size: 28px;
+            color: white;
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+            letter-spacing: -0.025em;
+        }
+
+        .header-text p {
+            color: var(--gray-600);
+            font-size: 15px;
+            max-width: 600px;
+        }
+
+        .system-badge {
+            background: var(--primary-50);
+            color: var(--primary-700);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid var(--primary-200);
+        }
+
+        /* ====== DASHBOARD STATS ====== */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--surface-0);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-200);
+        }
+
+        .stat-card.out-of-stock {
+            cursor: pointer;
+        }
+
+        .stat-card.out-of-stock:hover {
+            border-color: var(--error-500);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+            color: var(--primary-600);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: var(--success-500);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: var(--error-500);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+            letter-spacing: -0.025em;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray-600);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* ====== MAIN FORM CONTAINER ====== */
+        .form-container {
+            background: var(--surface-0);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
+        }
+
+        /* ====== FORM HEADER ====== */
+        .form-header {
+            padding: 32px 32px 0;
+            margin-bottom: 8px;
+        }
+
+        .form-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .form-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .form-title-badge {
+            background: var(--primary-100);
+            color: var(--primary-700);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ====== FORM SECTIONS ====== */
+        .form-section {
+            padding: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-50);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-600);
+            font-size: 18px;
+        }
+
+        .section-title-group h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        /* ====== FORM GRID ====== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* ====== FORM CONTROLS ====== */
+        .control-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .control-label-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-label-text.required::after {
+            content: "•";
+            color: var(--error-500);
+            font-size: 16px;
+        }
+
+        .control-hint {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .form-input {
+            width: 100%;
+            height: 44px;
+            padding: 0 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition-fast);
+            background: var(--surface-0);
+            color: var(--gray-800);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px var(--primary-100);
+        }
+
+        .form-input:hover:not(:focus) {
+            border-color: var(--gray-300);
+        }
+
+        .form-input.error {
+            border-color: var(--error-500);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .form-input.success {
+            border-color: var(--success-500);
+        }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
+        }
+
+        /* ====== FORM FEEDBACK ====== */
+        .input-feedback {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            min-height: 20px;
+        }
+
+        .error-message {
+            color: var(--error-500);
+        }
+
+        .success-message {
+            color: var(--success-500);
+        }
+
+        #nameExistsMsg {
+            background: var(--error-500);
+            color: white;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        /* ====== FORM ACTIONS ====== */
+        .form-actions {
+            padding: 32px;
+            background: var(--surface-50);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-base);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.025em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            color: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--surface-0);
+            color: var(--gray-700);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-300);
+        }
+
+        .keyboard-hint {
+            color: var(--gray-500);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .keyboard-shortcut {
+            background: var(--gray-100);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            border: 1px solid var(--gray-200);
+        }
+
+        /* ====== FOOTER ====== */
+        .enterprise-footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--gray-500);
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+            background: var(--surface-0);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 12px;
+        }
+
+        .footer-link {
+            color: var(--primary-600);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+
+        .footer-link:hover {
+            color: var(--primary-700);
+            text-decoration: underline;
+        }
+
+        /* ====== ANIMATIONS ====== */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* ====== RESPONSIVE DESIGN ====== */
+        @media (max-width: 1024px) {
+            .enterprise-container {
+                padding: 16px;
+            }
+
+            .enterprise-header {
+                padding: 24px;
+            }
+
+            .form-section {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .enterprise-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .header-content {
+                width: 100%;
+            }
+
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .keyboard-hint {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .enterprise-header {
+                padding: 20px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+
+            .form-header {
+                padding: 20px 20px 0;
+            }
+
+            .form-section {
+                padding: 20px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+
+        /* ====== UTILITY CLASSES ====== */
+        .loading {
+            position: relative;
+            color: transparent !important;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="enterprise-container">
+        <!-- Enterprise Header -->
+        <header class="enterprise-header">
+            <div class="header-content">
+                <div class="header-icon-container">
+                    <span class="header-icon">📦</span>
+                </div>
+                <div class="header-text">
+                    <h1>Product Management System</h1>
+                    <p>Punchiri Stores • Inventory Management</p>
+                </div>
+            </div>
+            <div class="system-badge">
+                v2.5.1
+            </div>
+        </header>
+
+        <!-- Dashboard Stats -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value" id="productCount">0</div>
+                <div class="stat-label">Total Products</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="stockValue">₹ 0.00</div>
+                <div class="stat-label">Stock Value</div>
+            </div>
+
+            <div class="stat-card out-of-stock" onclick="openOutOfStock()">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-value" id="activeCount">0</div>
+                <div class="stat-label">Out of Stock</div>
+            </div>
+        </div>
+
+        <!-- Main Form Container -->
+        <main class="form-container">
+            <!-- Form Header -->
+            <div class="form-header">
+                <div class="form-title">
+                    <h2>Add New Product</h2>
+                    <span class="form-title-badge">Required fields marked with •</span>
+                </div>
+            </div>
+
+            <form id="productForm" onsubmit="return false;">
+                <!-- Section 1: Product Information -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon">📋</div>
+                        <div class="section-title-group">
+                            <h3>Product Information</h3>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text required">
+                                    <span>📛</span>
+                                    Product Name
+                                </span>
+                            </div>
+                            <input type="text" id="name" class="form-input" autocomplete="off"
+                                placeholder="Enter product name" aria-describedby="nameExistsMsg">
+                            <div id="nameExistsMsg">⚠ This product name already exists!</div>
+                        </div>
+
+                        <!-- Barcode Field -->
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text">
+                                    <span>🏷️</span>
+                                    Barcode (Optional)
+                                </span>
+                            </div>
+                            <input type="text" id="barcode" class="form-input" autocomplete="off"
+                                placeholder="Scan or enter barcode (6-20 characters)" 
+                                minlength="6" maxlength="20">
+                            <small style="color: #64748b; font-size: 12px; display: block; margin-top: 4px;">
+                                Leave empty if product has no barcode
+                            </small>
+                            <div id="barcodeError" style="display: none; color: #ef4444; font-size: 13px; margin-top: 4px;">
+                                ⚠ Barcode error
+                            </div>
+                        </div>
+
+                        <!-- Barcode Type Field -->
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text">
+                                    <span>🔖</span>
+                                    Barcode Type
+                                </span>
+                            </div>
+                            <select id="barcode_type" class="form-input">
+                                <option value="">-- Select Type --</option>
+                                <option value="MANUFACTURER">Manufacturer Barcode</option>
+                                <option value="INTERNAL">Internal Store Barcode</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text required">
+                                    <span>📏</span>
+                                    Unit Type
+                                </span>
+                            </div>
+                            <select id="unit" class="form-input">
+                                <option value="">Select unit type</option>
+                                <option value="kg">Kilograms (kg)</option>
+                                <option value="pc">Pieces (pc)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text required">
+                                    <span>🔢</span>
+                                    Quantity
+                                </span>
+                            </div>
+                            <input type="number" id="quantity" class="form-input" min="1" step="1"
+                                placeholder="Enter quantity">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Pricing Information -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon">💰</div>
+                        <div class="section-title-group">
+                            <h3>Pricing Information</h3>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text required">
+                                    <span>🛒</span>
+                                    Purchase Price
+                                </span>
+                            </div>
+                            <input type="number" id="purchase_price" class="form-input" min="0.01" step="0.01"
+                                placeholder="0.00">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text required">
+                                    <span>🏪</span>
+                                    Retail Price
+                                </span>
+                            </div>
+                            <input type="number" id="retail_price" class="form-input" min="0.01" step="0.01" placeholder="0.00">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text required">
+                                    <span>🏭</span>
+                                    Wholesale Price
+                                </span>
+                            </div>
+                            <input type="number" id="wholesale_price" class="form-input" min="0.01" step="0.01" placeholder="0.00">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text">
+                                    <span>📦</span>
+                                    Wholesale Min Qty
+                                </span>
+                            </div>
+                            <input type="number" id="wholesale_min_qty" class="form-input" step="any"
+                                placeholder="Minimum quantity">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Additional Details -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon">📄</div>
+                        <div class="section-title-group">
+                            <h3>Additional Information</h3>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text">
+                                    <span>📊</span>
+                                    Initial Stock
+                                </span>
+                            </div>
+                            <input type="number" id="initial_stock" class="form-input" step="any"
+                                placeholder="Initial stock">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text">
+                                    <span>📅</span>
+                                    Expiry Date
+                                </span>
+                            </div>
+                            <input type="date" id="expiry_date" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text">
+                                    <span>💸</span>
+                                    Extra Expenses
+                                </span>
+                            </div>
+                            <input type="number" id="extra_expenses" class="form-input" step="0.01" placeholder="0.00">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text">
+                                    <span>🏢</span>
+                                    Supplier Name
+                                </span>
+                            </div>
+                            <input type="text" id="purchased_from" class="form-input" placeholder="Supplier name">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">
+                                <span class="control-label-text required">
+                                    <span>📅</span>
+                                    Purchase Date
+                                </span>
+                            </div>
+                            <input type="date" id="purchase_date" class="form-input">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <div class="keyboard-hint">
+                        <span>Quick navigation:</span>
+                        <span class="keyboard-shortcut">Tab</span>
+                        <span class="keyboard-shortcut">Enter</span>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="document.getElementById('productForm').reset(); setTodayPurchaseDate();">
+                            <span>🗑️</span>
+                            Clear Form
+                        </button>
+                        <button id="saveBtn" type="button" class="btn btn-primary">
+                            <span>💾</span>
+                            Save Product
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </main>
+
+        <!-- Enterprise Footer -->
+        <footer class="enterprise-footer">
+            <div>© 2024 Punchiri Stores</div>
+        </footer>
+    </div>
+
+    <!-- ====== ORIGINAL JAVASCRIPT FUNCTIONS - NO CHANGES ====== -->
+    <script>
+
+        function $(id) { return document.getElementById(id); }
+
+        /* AUTOFILL PURCHASE DATE WITH TODAY */
+        function setTodayPurchaseDate() {
+            const today = new Date().toISOString().split("T")[0];
+            $("purchase_date").value = today;
+        }
+
+        /* LOAD EXISTING PRODUCT NAMES */
+        let existingNames = [];
+
+        async function loadExisting() {
+            try {
+                let res = await fetch("http://localhost:3000/products");
+                let data = await res.json();
+                existingNames = data.map(p => p.name.toLowerCase());
+
+                // ✅ Total products
+                $("productCount").textContent = data.length;
+
+                // ✅ Active products = stock > 0
+                $("activeCount").textContent = data.filter(
+                    p => Number(p.stock_qty) <= 0
+                ).length;
+
+                // ✅ LIVE STOCK VALUE (purchase cost)
+                let stockValue = 0;
+
+                data.forEach(p => {
+                    const qty = Number(p.stock_qty) || 0;
+                    const cost = Number(p.purchase_price) || 0;
+
+                    if (qty > 0 && cost > 0) {
+                        stockValue += qty * cost;
+                    }
+                });
+
+                $("stockValue").textContent =
+                    "₹ " + Number(stockValue).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+            } catch (e) {
+                console.log("Could not load existing products:", e);
+            }
+        }
+
+        /* UNIT VALIDATION - pieces cannot have decimals - FIXED SINGLE ALERT */
+        (function () {
+            const unitEl = document.getElementById("unit");
+            const qtyEl = document.getElementById("quantity");
+            const initialStockEl = document.getElementById("initial_stock");
+
+            if (!unitEl || !qtyEl || !initialStockEl) return;
+
+            // Unit change
+            unitEl.addEventListener("change", () => {
+                if (unitEl.value === "pc") {
+                    qtyEl.setAttribute("step", "1");
+                    initialStockEl.setAttribute("step", "1");
+                } else {
+                    qtyEl.setAttribute("step", "any");
+                    initialStockEl.setAttribute("step", "any");
+                }
+            });
+
+            // REMOVED the paste and Enter validators that cause duplicate alerts
+            // We'll handle validation in validateField() function only
+        })();
+
+        /* PREVENT NEGATIVE VALUES IN NUMBER INPUTS */
+        (function () {
+            const numberInputs = [
+                'quantity',
+                'purchase_price',
+                'retail_price',
+                'wholesale_price',
+                'wholesale_min_qty',
+                'initial_stock',
+                'extra_expenses'
+            ];
+
+            numberInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.addEventListener("input", function(e) {
+                        let value = e.target.value;
+                        // Remove minus sign and any non-numeric characters except decimal point
+                        value = value.replace(/[^0-9.]/g, '');
+                        if (e.target.value !== value) {
+                            e.target.value = value;
+                        }
+                    });
+                }
+            });
+        })();
+
+        /* VALIDATE A SINGLE FIELD */
+        function validateField(fieldId) {
+            const field = $(fieldId);
+            if (!field) return true;
+
+            const value = field.value.trim();
+            const isSelect = field.tagName === 'SELECT';
+
+            // List of required fields
+            const requiredFields = ["name", "unit", "quantity", "purchase_price", "retail_price", "wholesale_price", "purchase_date"];
+
+            if (requiredFields.includes(fieldId)) {
+                if ((isSelect && value === "") || (!isSelect && value === "")) {
+                    field.classList.add('error');
+
+                    // Show alert for this field
+                    let fieldName = fieldId.replace("_", " ").toUpperCase();
+                    if (fieldId === "name") fieldName = "Product Name";
+                    if (fieldId === "unit") fieldName = "Unit";
+
+                    if (fieldId === "unit") {
+                        alert("Please select a unit (kg or pieces)!");
+                    } else {
+                        alert(fieldName + " is required!");
+                    }
+
+                    field.focus();
+                    return false;
+                }
+
+                // Additional validation for numbers
+                if (["quantity", "purchase_price", "retail_price", "wholesale_price"].includes(fieldId)) {
+                    const numValue = Number(value);
+                    if (isNaN(numValue) || numValue <= 0) {
+                        field.classList.add('error');
+                        let fieldName = fieldId.replace("_", " ").toUpperCase();
+                        if (fieldId === "purchase_price") fieldName = "Purchase Price";
+                        if (fieldId === "retail_price") fieldName = "Retail Price";
+                        if (fieldId === "wholesale_price") fieldName = "Wholesale Price";
+                        alert(fieldName + " must be greater than 0!");
+                        field.focus();
+                        return false;
+                    }
+                }
+
+                // Special validation for pieces - ONLY ONE ALERT
+                if (fieldId === "quantity" && $("unit").value === "pc") {
+                    if (value.includes(".")) {
+                        field.classList.add('error');
+                        // Don't show alert here - it will show in Enter validation
+                        field.focus();
+                        return false;
+                    }
+                }
+            }
+
+            field.classList.remove('error');
+            return true;
+        }
+
+        /* LIVE DUPLICATE CHECK - IMMEDIATE */
+        $("name").addEventListener("input", function () {
+            let name = this.value.trim().toLowerCase();
+            let msg = $("nameExistsMsg");
+
+            if (name === "") {
+                msg.style.display = "none";
+                this.classList.remove("error");
+                return;
+            }
+
+            if (existingNames.includes(name)) {
+                msg.style.display = "block";
+                this.classList.add("error");
+            } else {
+                msg.style.display = "none";
+                this.classList.remove("error");
+            }
+        });
+
+        /* ENTER KEY NAVIGATION - WITH VALIDATION */
+        const order = [
+            "name", "unit", "quantity",
+            "purchase_price", "retail_price", "wholesale_price",
+            "wholesale_min_qty", "initial_stock", "expiry_date",
+            "extra_expenses", "purchased_from", "purchase_date"
+        ];
+
+        order.forEach((id, idx) => {
+            let el = $(id);
+            if (!el) return;
+
+            el.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+
+                    // Validate current field BEFORE moving to next
+                    if (!validateField(id)) {
+                        // Special check for pieces decimal - show alert only here
+                        if (id === "quantity" && $("unit").value === "pc" && el.value.includes(".")) {
+                            alert("Quantity cannot be decimal for pieces!");
+                        }
+                        return; // Stop if validation fails
+                    }
+
+                    // Check for duplicate name if it's the name field
+                    if (id === "name") {
+                        const name = el.value.trim().toLowerCase();
+                        if (existingNames.includes(name)) {
+                            el.classList.add("error");
+                            $("nameExistsMsg").style.display = "block";
+                            alert("Product name already exists! Please use a different name.");
+                            return;
+                        }
+                    }
+
+                    // Move to next field
+                    let next = idx + 1;
+                    while (next < order.length) {
+                        let nextEl = $(order[next]);
+                        if (nextEl) {
+                            nextEl.focus();
+                            break;
+                        }
+                        next++;
+                    }
+                }
+            });
+        });
+
+        /* CLEAR ERRORS WHEN TYPING */
+        function setupFieldClearing() {
+            const allInputs = document.querySelectorAll('input, select');
+            allInputs.forEach(input => {
+                input.addEventListener('input', function () {
+                    this.classList.remove('error');
+                    if (this.id === 'name') {
+                        $("nameExistsMsg").style.display = "none";
+                    }
+                });
+
+                // For select fields
+                if (input.tagName === 'SELECT') {
+                    input.addEventListener('change', function () {
+                        this.classList.remove('error');
+                    });
+                }
+            });
+        }
+
+        /* SAVE PRODUCT - WITH PROPER VALIDATION */
+        $("saveBtn").onclick = async () => {
+            // Validate all required fields first
+            let hasError = false;
+
+            const requiredFields = [
+                { id: "name", name: "Product Name" },
+                { id: "unit", name: "Unit" },
+                { id: "quantity", name: "Quantity" },
+                { id: "purchase_price", name: "Purchase Price" },
+                { id: "retail_price", name: "Retail Price" },
+                { id: "wholesale_price", name: "Wholesale Price" },
+                { id: "purchase_date", name: "Purchase Date" }
+            ];
+
+            // Check each required field
+            for (let field of requiredFields) {
+                const el = $(field.id);
+                const value = el.value.trim();
+
+                if (value === "") {
+                    el.classList.add("error");
+
+                    if (field.id === "unit") {
+                        alert("Please select a unit (kg or pieces)!");
+                    } else {
+                        alert(field.name + " is required!");
+                    }
+
+                    el.focus();
+                    hasError = true;
+                    return;
+                }
+            }
+
+            // Validate barcode (if provided)
+            const barcodeValid = await validateBarcode();
+            if (!barcodeValid) {
+                return;
+            }
+
+            // Validate numbers are positive
+            const numberFields = ["quantity", "purchase_price", "retail_price", "wholesale_price"];
+            for (let id of numberFields) {
+                const el = $(id);
+                const value = Number(el.value);
+
+                if (isNaN(value) || value <= 0) {
+                    el.classList.add("error");
+                    el.focus();
+                    let fieldName = id.replace("_", " ").toUpperCase();
+                    if (id === "purchase_price") fieldName = "Purchase Price";
+                    if (id === "retail_price") fieldName = "Retail Price";
+                    if (id === "wholesale_price") fieldName = "Wholesale Price";
+                    alert(fieldName + " must be greater than 0!");
+                    return;
+                }
+            }
+
+            // Check duplicate name
+            const productName = $("name").value.trim().toLowerCase();
+            if (existingNames.includes(productName)) {
+                $("name").classList.add("error");
+                $("nameExistsMsg").style.display = "block";
+                $("name").focus();
+                alert("Product name already exists! Please use a different name.");
+                return;
+            }
+
+            // Validate pieces cannot be decimal - ONLY ONE ALERT
+            if ($("unit").value === "pc") {
+                const qty = $("quantity").value;
+                const initStock = $("initial_stock").value;
+
+                if (qty.includes(".")) {
+                    $("quantity").classList.add("error");
+                    $("quantity").focus();
+                    alert("Quantity cannot be decimal for pieces!");
+                    return;
+                }
+
+                if (initStock && initStock.includes(".")) {
+                    $("initial_stock").classList.add("error");
+                    $("initial_stock").focus();
+                    alert("Initial stock cannot be decimal for pieces!");
+                    return;
+                }
+            }
+
+            // Build payload with barcode fields
+            const payload = {
+                name: $("name").value.trim(),
+                unit: $("unit").value,
+                quantity: Number($("quantity").value) || 0,
+                initial_stock: Number($("initial_stock").value) || 0,
+                purchase_price: Number($("purchase_price").value),
+                retail_price: Number($("retail_price").value),
+                wholesale_price: Number($("wholesale_price").value),
+                wholesale_min_qty: Number($("wholesale_min_qty").value) || 0,
+                expiry_date: $("expiry_date").value || null,
+                extra_expenses: Number($("extra_expenses").value) || 0,
+                purchased_from: $("purchased_from").value.trim() || "",
+                purchase_date: $("purchase_date").value,
+                barcode: $("barcode").value.trim().toUpperCase() || null,
+                barcode_type: $("barcode_type").value || null
+            };
+
+            // Show saving indicator
+            const saveBtn = $("saveBtn");
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = "Saving...";
+            saveBtn.disabled = true;
+
+            try {
+                const resp = await fetch("http://localhost:3000/add-product", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                let bodyText;
+                try { bodyText = await resp.text(); } catch (e) { bodyText = ""; }
+
+                // Try to parse JSON
+                let bodyJson = null;
+                try { bodyJson = JSON.parse(bodyText); } catch (e) { /* not JSON */ }
+
+                if (!resp.ok) {
+                    // Show server error message
+                    if (bodyJson && (bodyJson.message || bodyJson.error || bodyJson.status)) {
+                        alert("Server error: " + (bodyJson.message || bodyJson.error || JSON.stringify(bodyJson)));
+                    } else if (bodyText) {
+                        alert("Server error: " + bodyText);
+                    } else {
+                        alert("Server returned status " + resp.status);
+                    }
+                    console.error("add-product failed:", resp.status, bodyJson || bodyText);
+                    return;
+                }
+
+                // Success
+                if (bodyJson && bodyJson.status === "success") {
+                    alert("✅ Product added successfully!\nID: " + bodyJson.id + "\nStock: " + bodyJson.stock);
+
+                    // Reset form but keep today's date
+                    document.getElementById("productForm").reset();
+                    setTodayPurchaseDate();
+                    $("name").focus();
+
+                    // Reload existing names
+                    await loadExisting();
+                } else {
+                    alert("⚠️ Unexpected response: " + (bodyText || JSON.stringify(bodyJson)));
+                    console.log("response:", bodyJson || bodyText);
+                }
+            } catch (err) {
+                alert("❌ Network error: " + err.message);
+                console.error(err);
+            } finally {
+                // Restore button
+                saveBtn.innerHTML = originalHTML;
+                saveBtn.disabled = false;
+            }
+        };
+
+        /* INITIALIZE EVERYTHING */
+        document.addEventListener("DOMContentLoaded", function () {
+            // Set today's date
+            setTodayPurchaseDate();
+
+            // Load existing products for duplicate check
+            loadExisting();
+
+            // Setup field clearing (removes errors when typing)
+            setupFieldClearing();
+            
+            // Barcode URL parameter pre-fill
+            const urlParams = new URLSearchParams(window.location.search);
+            const barcodeParam = urlParams.get('barcode');
+            if (barcodeParam) {
+                $('barcode').value = barcodeParam;
+                $('barcode').focus();
+                // Show notification
+                const notification = document.createElement('div');
+                notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #3b82f6; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 9999;';
+                notification.textContent = 'Please enter product details for this barcode';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            } else {
+                $("name").focus();
+            }
+        });
+
+        /* BARCODE VALIDATION */
+        async function validateBarcode() {
+            const barcodeInput = $('barcode');
+            const barcode = barcodeInput.value.trim().toUpperCase();
+            const errorDiv = $('barcodeError');
+            
+            // Clear previous errors
+            errorDiv.style.display = 'none';
+            barcodeInput.classList.remove('error');
+            
+            if (!barcode) {
+                return true; // Empty is allowed
+            }
+            
+            // Length validation
+            if (barcode.length < 6 || barcode.length > 20) {
+                errorDiv.textContent = '⚠ Barcode must be 6-20 characters';
+                errorDiv.style.display = 'block';
+                barcodeInput.classList.add('error');
+                return false;
+            }
+            
+            // Whitespace validation
+            if (/^\s*$/.test(barcode)) {
+                errorDiv.textContent = '⚠ Barcode cannot be only whitespace';
+                errorDiv.style.display = 'block';
+                barcodeInput.classList.add('error');
+                return false;
+            }
+            
+            // Duplicate check
+            try {
+                const response = await fetch(`http://localhost:3000/api/barcode/validate/${barcode}`);
+                const result = await response.json();
+                
+                if (result.exists) {
+                    errorDiv.textContent = `⚠ Barcode already exists for product: ${result.product_name}`;
+                    errorDiv.style.display = 'block';
+                    barcodeInput.classList.add('error');
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Barcode validation error:', error);
+                errorDiv.textContent = '⚠ Failed to validate barcode';
+                errorDiv.style.display = 'block';
+                barcodeInput.classList.add('error');
+                return false;
+            }
+        }
+
+        function openOutOfStock() {
+            window.location.href = "out-of-stock.html";
+        }
+    </script>
+</body>
+
+</html>

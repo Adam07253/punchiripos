@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Add Stock — Punchiri Stores</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        /* ===== SOFTWARE UI THEME ===== */
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #0d47a1;
+            --primary-light: #e8f0fe;
+            --secondary: #5f6368;
+            --success: #34a853;
+            --warning: #f9ab00;
+            --error: #d93025;
+            --background: #f8f9fa;
+            --surface: #ffffff;
+            --border: #dadce0;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .header-title p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .content-wrapper {
+            padding: 0;
+        }
+
+        /* ===== FORM SECTIONS ===== */
+        .form-section {
+            padding: 24px 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-light);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* ===== FORM CONTROLS ===== */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: var(--error);
+        }
+
+        .form-control {
+            width: 100%;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            transition: all 0.2s;
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .form-control:hover {
+            border-color: #bdc1c6;
+        }
+
+        .form-control.error {
+            border-color: var(--error);
+            background: rgba(217, 48, 37, 0.02);
+        }
+
+        /* ===== AUTOCOMPLETE BOX ===== */
+        .search-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        #suggest {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-md);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            margin-top: 2px;
+        }
+
+        .suggest-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .suggest-item:hover,
+        .suggest-item.active {
+            background: var(--primary-light);
+        }
+
+        .suggest-name {
+            font-weight: 500;
+        }
+
+        .suggest-price {
+            font-size: 13px;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* ===== PRODUCT INFO CARD ===== */
+        .product-info-card {
+            background: var(--primary-light);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid var(--border);
+            display: none;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .info-value.stock {
+            color: var(--primary);
+        }
+
+        .info-value.price {
+            color: var(--success);
+        }
+
+        .info-label {
+            font-size: 13px;
+            /* ⬆ slightly bigger */
+            font-weight: 600;
+            /* ⬆ semi-bold */
+            color: #5f6368;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        /* Value text (7 pc, ₹18, dates, etc.) */
+        .info-value {
+            font-size: 17px;
+            /* ⬆ clearly bigger */
+            font-weight: 700;
+            /* ⬆ bold */
+            color: #202124;
+            line-height: 1.3;
+        }
+
+        /* Stock highlight */
+        .info-value.stock {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1a73e8;
+        }
+
+        /* Price highlight */
+        .info-value.price {
+            font-size: 18px;
+            font-weight: 800;
+            color: #188038;
+        }
+
+        .price-good {
+            color: #188038 !important;
+            /* green */
+        }
+
+        .price-bad {
+            color: #d93025 !important;
+            /* red */
+        }
+
+        /* Clickable date */
+        .info-value.clickable {
+            font-weight: 700;
+        }
+
+        .info-value.preview {
+            color: #f57c00;
+            /* orange preview */
+            font-weight: 800;
+        }
+
+        .info-label.preview::after {
+            content: " (after add)";
+            font-size: 11px;
+            font-weight: 600;
+            color: #f57c00;
+        }
+
+        /* ===== BUTTONS ===== */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            min-width: 140px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+        }
+
+        /* ===== FOOTER ===== */
+        .app-footer {
+            padding: 16px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: #f8f9fa;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            body {
+                padding: 0;
+                background: var(--surface);
+            }
+
+            .form-section {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-header {
+                padding: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .header-title h1 {
+                font-size: 20px;
+            }
+
+            .form-section {
+                padding: 16px;
+            }
+        }
+
+        .sitem {
+            padding: 10px 14px;
+            margin: 6px 8px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            background: #ffffff;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+        /* name + price row */
+        .suggest-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+
+            font-size: 14px;
+            font-weight: 600;
+            /* ✅ slightly bold */
+            color: #202124;
+        }
+
+        /* mouse hover */
+        .sitem:hover {
+            background: rgba(26, 115, 232, 0.10);
+            border-color: rgba(26, 115, 232, 0.35);
+        }
+
+        /* ⬆⬇ arrow-key selected */
+        .sitem.active {
+            background: rgba(26, 115, 232, 0.28);
+            border-left: 4px solid #1a73e8;
+        }
+
+        /* selected text emphasis */
+        .sitem.active .suggest-line {
+            font-weight: 700;
+            color: #0d47a1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-icon">📦</div>
+            <div class="header-title">
+                <h1>Add Stock / Purchase Entry</h1>
+                <p>Punchiri Stores • Inventory Management</p>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <div class="content-wrapper">
+            <!-- PRODUCT SEARCH SECTION -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">🔍</div>
+                    <div>
+                        <div class="section-title">Select Product</div>
+                        <div class="section-subtitle">Search by product name, ID, or scan barcode</div>
+                    </div>
+                </div>
+
+                <!-- Barcode Search Field -->
+                <div class="form-group">
+                    <label class="form-label">Barcode Scanner</label>
+                    <div class="search-container">
+                        <input id="barcodeSearch" class="form-control" type="text" autocomplete="off"
+                            placeholder="Scan or type barcode to find product" autofocus>
+                        <small style="color: #64748b; font-size: 12px; display: block; margin-top: 4px;">
+                            Scanner input will auto-populate product details
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">Product Name</label>
+                    <div class="search-container">
+                        <input id="prodSearch" class="form-control" type="text" autocomplete="off"
+                            placeholder="Type product name or ID">
+                        <div id="suggest"></div>
+                    </div>
+                </div>
+
+                <div id="productInfo" class="product-info-card"></div>
+            </div>
+
+            <!-- ADD NEW STOCK SECTION -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">➕</div>
+                    <div>
+                        <div class="section-title">Add New Stock</div>
+                        <div class="section-subtitle">Enter purchase details</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label required">Quantity</label>
+                        <input type="number" id="qty" min="1" step="1" class="form-control"
+                            placeholder="Enter quantity">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Purchase Price</label>
+                        <input type="number" id="purchase_price" class="form-control" min="0.01" step="0.01"
+                            placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Extra Expenses</label>
+                    <input type="number" id="extra_expenses" class="form-control" step="any" placeholder="Optional">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Expiry Date</label>
+                        <input type="date" id="expiry_date" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Purchased From</label>
+                        <input type="text" id="purchased_from" class="form-control" placeholder="Supplier name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">Purchase Date</label>
+                    <input type="date" id="purchase_date" class="form-control">
+                </div>
+
+                <div class="form-actions">
+                    <button id="addBtn" class="btn btn-primary">Add Stock</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">💰</div>
+                    <div>
+                        <div class="section-title">Update Prices</div>
+                        <div class="section-subtitle">Enter flow: Min Qty → Retail → Wholesale → Special → Save</div>
+                    </div>
+                </div>
+
+                <!-- ROW 1 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Min Wholesale Quantity</label>
+                        <input type="number" id="minWholesaleQty" class="form-control" step="any"
+                            placeholder="Optional">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">New Retail Price</label>
+                        <input type="number" id="newRetail" class="form-control" step="any"
+                            placeholder="Retail price per unit">
+                    </div>
+                </div>
+
+                <!-- ROW 2 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">New Wholesale Price</label>
+                        <input type="number" id="newWholesale" class="form-control" step="any"
+                            placeholder="Wholesale price per unit">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">New Special Price</label>
+                        <input type="number" id="newSpecial" class="form-control" step="any"
+                            placeholder="Optional special price">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="updatePriceBtn" class="btn btn-primary">Update Prices</button>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="app-footer">
+                <div>© 2024 Punchiri Stores • Stock Management</div>
+            </footer>
+        </div>
+
+        <!-- EXTERNAL SCRIPT (UNCHANGED) -->
+        <script src="searchProducts.js"></script>
+
+        <!-- YOUR ORIGINAL JAVASCRIPT (NO CHANGES) -->
+        <script>
+            // ========== BARCODE LOOKUP HANDLER ==========
+            document.getElementById('barcodeSearch').addEventListener('keydown', async (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const barcode = e.target.value.trim().toUpperCase();
+                    
+                    if (!barcode) return;
+                    
+                    await lookupProductByBarcode(barcode);
+                    e.target.value = ''; // Clear for next scan
+                }
+            });
+
+            async function lookupProductByBarcode(barcode) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/product/barcode/${barcode}`);
+                    
+                    if (response.ok) {
+                        const product = await response.json();
+                        
+                        // Select the product
+                        selected = product;
+                        currentUnit = product.unit;
+                        
+                        // Update product search field
+                        document.getElementById('prodSearch').value = product.name;
+                        
+                        // Display product info
+                        displayProductInfo(product);
+                        
+                        // Focus on quantity field
+                        document.getElementById('qty').focus();
+                        
+                        // Show success message
+                        showNotification(`Product found: ${product.name}`, 'success');
+                    } else if (response.status === 404) {
+                        showNotification(`No product found for barcode: ${barcode}`, 'error');
+                    } else {
+                        showNotification('Failed to lookup barcode', 'error');
+                    }
+                } catch (error) {
+                    console.error('Barcode lookup error:', error);
+                    showNotification('Network error during barcode lookup', 'error');
+                }
+            }
+
+            function showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed; 
+                    top: 20px; 
+                    right: 20px; 
+                    background: ${type === 'success' ? '#10b981' : '#ef4444'}; 
+                    color: white; 
+                    padding: 12px 20px; 
+                    border-radius: 8px; 
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+                    z-index: 9999;
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+
+            function displayProductInfo(product) {
+                const infoDiv = document.getElementById('productInfo');
+                infoDiv.innerHTML = `
+                    <div style="padding: 16px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">${product.name}</div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 14px;">
+                            <div><span style="color: #64748b;">Current Stock:</span> <strong>${product.stock_qty} ${product.unit}</strong></div>
+                            <div><span style="color: #64748b;">Unit:</span> <strong>${product.unit}</strong></div>
+                            <div><span style="color: #64748b;">Retail Price:</span> <strong>₹${product.retail_price}</strong></div>
+                            <div><span style="color: #64748b;">Wholesale Price:</span> <strong>₹${product.wholesale_price}</strong></div>
+                        </div>
+                    </div>
+                `;
+            }
+            // ========== END BARCODE HANDLER ==========
+
+            function formatDateDDMMYYYY(dateStr) {
+                if (!dateStr) return "-";
+                const d = new Date(dateStr);
+                if (isNaN(d)) return "-";
+
+                const day = String(d.getDate()).padStart(2, "0");
+                const month = String(d.getMonth() + 1).padStart(2, "0");
+                const year = d.getFullYear();
+
+                return `${day}-${month}-${year}`;
+            }
+            /* =====================================================
+                UTILITY SHORTCUTS
+            ===================================================== */
+            const $ = id => document.getElementById(id);
+            const today = new Date().toISOString().split("T")[0];
+            $("purchase_date").value = today;
+
+            let products = [];
+            let selected = null;
+            let currentUnit = null;
+            const qtyInput = $("qty");
+            const priceInput = $("purchase_price");
+
+            qtyInput.addEventListener("input", previewStock);
+            priceInput.addEventListener("input", previewStock);
+
+            // Prevent negative values in quantity input
+            qtyInput.addEventListener("input", function(e) {
+                let value = e.target.value;
+                // Remove minus sign and any non-numeric characters except decimal point
+                value = value.replace(/[^0-9.]/g, '');
+                if (e.target.value !== value) {
+                    e.target.value = value;
+                }
+            });
+
+            // Prevent negative values in purchase price input
+            priceInput.addEventListener("input", function(e) {
+                let value = e.target.value;
+                // Remove minus sign and any non-numeric characters except decimal point
+                value = value.replace(/[^0-9.]/g, '');
+                if (e.target.value !== value) {
+                    e.target.value = value;
+                }
+            });
+
+            // Prevent negative values in extra expenses input
+            const extraExpensesInput = $("extra_expenses");
+            if (extraExpensesInput) {
+                extraExpensesInput.addEventListener("input", function(e) {
+                    let value = e.target.value;
+                    // Remove minus sign and any non-numeric characters except decimal point
+                    value = value.replace(/[^0-9.]/g, '');
+                    if (e.target.value !== value) {
+                        e.target.value = value;
+                    }
+                });
+            }
+
+            function previewStock() {
+                if (!selected) return;
+
+                let qty = Number(qtyInput.value);
+                let totalPrice = Number(priceInput.value);
+
+                if (!qty || !totalPrice || qty <= 0 || totalPrice <= 0) {
+                    showProductInfo(); // reset preview
+                    return;
+                }
+
+                if (currentUnit === "pc" && !Number.isInteger(qty)) {
+                    showProductInfo();
+                    return;
+                }
+
+                const newStock = Number(selected.stock_qty) + qty;
+                const perUnitPrice = (totalPrice / qty).toFixed(2);
+
+                $('productInfo').innerHTML = `
+        <div class="info-grid">
+
+            <!-- ROW 1 -->
+            <div class="info-item">
+                <div class="info-label preview">Current Stock</div>
+                <div class="info-value stock preview">${fmtStock(newStock, selected.unit)}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Last Purchase Date</div>
+                <div class="info-value">${formatDateDDMMYYYY(selected.purchase_date)}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Min Wholesale Qty</div>
+                <div class="info-value">${selected.wholesale_min_qty || "-"}</div>
+            </div>
+
+            <!-- ROW 2 -->
+            <div class="info-item">
+                <div class="info-label preview">Last Purchase Price</div>
+                <div class="info-value price preview price-good">
+    ₹${perUnitPrice}
+</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Retail Price</div>
+                <div class="info-value price">₹${selected.retail_price}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Wholesale Price</div>
+                <div class="info-value price">₹${selected.wholesale_price}</div>
+            </div>
+
+            <!-- ROW 3 -->
+            <div class="info-item">
+                <div class="info-label">Purchased From</div>
+                <div class="info-value">${selected.purchased_from || "-"}</div>
+            </div>
+
+        </div>
+    `;
+            }
+            /* =====================================================
+                LOAD PRODUCTS
+            ===================================================== */
+            (async () => {
+                try {
+                    const r = await fetch("http://localhost:3000/products");
+                    products = await r.json();
+
+                    // ✅ INIT COMMON SEARCH (same as billing)
+                    setupProductSearch({
+                        inputId: "prodSearch",
+                        suggestId: "suggest",
+                        products,
+                        onSelect: (p) => {
+                            selected = p;
+                            currentUnit = p.unit;
+                            showProductInfo();
+                            $("qty").focus();
+                        },
+                        showRight: p => `₹${p.retail_price}`
+                    });
+
+                } catch (e) {
+                    alert("Cannot load products — server offline.");
+                }
+            })();
+            /* =====================================================
+                SHOW PRODUCT INFO
+            ===================================================== */
+            function fmtStock(v, unit) {
+                v = Number(v);
+                if (unit === "pc") return Math.round(v) + " pc";
+                if (Number.isInteger(v)) return v + " kg";
+                return v.toFixed(3) + " kg";
+            }
+            function priceClass(sellPrice, purchasePrice) {
+                if (sellPrice > purchasePrice) return "price-good";
+                return "price-bad";
+            }
+            function showProductInfo() {
+                const p = selected;
+                if (!p) return;
+
+                $('productInfo').innerHTML = `
+        <div class="info-grid">
+
+            <!-- ROW 1 -->
+            <div class="info-item">
+                <div class="info-label">Current Stock</div>
+                <div class="info-value stock">${fmtStock(p.stock_qty, p.unit)}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Last Purchase Date</div>
+                <div class="info-value clickable"
+                     style="cursor:pointer; color:#1a73e8; text-decoration:underline"
+                     onclick="openPurchaseHistory(${p.id})">
+                    ${formatDateDDMMYYYY(p.purchase_date)}
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Min Wholesale Qty</div>
+                <div class="info-value">${p.wholesale_min_qty || "-"}</div>
+            </div>
+
+            <!-- ROW 2 -->
+<div class="info-item">
+    <div class="info-label">Last Purchase Price</div>
+    <!-- 🟢 ALWAYS GREEN -->
+    <div class="info-value price price-good">
+        ₹${p.purchase_price}
+    </div>
+</div>
+
+<div class="info-item">
+    <div class="info-label">Retail Price</div>
+    <div class="info-value price ${priceClass(p.retail_price, p.purchase_price)}">
+        ₹${p.retail_price}
+    </div>
+</div>
+
+<div class="info-item">
+    <div class="info-label">Wholesale Price</div>
+    <div class="info-value price ${priceClass(p.wholesale_price, p.purchase_price)}">
+        ₹${p.wholesale_price}
+    </div>
+</div>
+
+${p.special_price !== null ? `
+<div class="info-item">
+    <div class="info-label">Special Price</div>
+    <div class="info-value price ${priceClass(p.special_price, p.purchase_price)}">
+        ₹${p.special_price}
+    </div>
+</div>
+` : ""}
+
+<div class="info-item">
+    <div class="info-label">Purchased From</div>
+    <div class="info-value">${p.purchased_from || "-"}</div>
+</div>
+    `;
+
+                $('productInfo').style.display = "block";
+            }
+
+            /* =====================================================
+                STRICT PC BLOCK: NO DECIMALS
+            ===================================================== */
+            const qtyEl = $("qty");
+            qtyEl.addEventListener("input", () => {
+                if ((qtyEl.value.match(/\./g) || []).length > 1) {
+                    qtyEl.value = qtyEl.value.slice(0, -1);
+                }
+            });
+            // 1) Block typing "."
+            qtyEl.addEventListener("keydown", e => {
+                if (currentUnit === "pc" && e.key === ".") {
+                    e.preventDefault();
+                    alert("Pieces cannot have decimals.");
+                }
+            });
+
+            // 2) Block pasting decimals
+            qtyEl.addEventListener("paste", e => {
+                if (currentUnit !== "pc") return;
+                const txt = (e.clipboardData || window.clipboardData).getData("text");
+                if (txt.includes(".")) {
+                    e.preventDefault();
+                    alert("Pieces cannot have decimals.");
+                }
+            });
+
+            // 3) Block leaving the field with decimals
+            qtyEl.addEventListener("blur", () => {
+                if (currentUnit === "pc" && qtyEl.value.includes(".")) {
+                    alert("Pieces cannot have decimals.");
+                    qtyEl.focus();
+                }
+            });
+
+            /* =====================================================
+                ENTER NAVIGATION + REQUIRED FIELDS
+                ✅ UPDATED: New price entry flow
+            ===================================================== */
+            const flow = [
+                "qty",
+                "purchase_price",
+                "extra_expenses",
+                "expiry_date",
+                "purchased_from",
+                "purchase_date"
+            ];
+
+            const mandatoryFields = ["qty", "purchase_price", "purchase_date"];
+
+            function isMandatoryField(id) {
+                return mandatoryFields.includes(id);
+            }
+
+            function isFieldEmpty(id) {
+                return !$(id).value.trim();
+            }
+
+            // ENTER key navigation with validation
+            flow.forEach((id, idx) => {
+                $(id).addEventListener("keydown", (e) => {
+                    if (e.key !== "Enter") return;
+                    e.preventDefault();
+
+                    // Required field check
+                    if (isMandatoryField(id) && isFieldEmpty(id)) {
+                        alert("This field is required");
+                        $(id).focus();
+                        return;
+                    }
+
+                    // Last field -> save
+                    if (id === "purchase_date") {
+                        saveStock();
+                        return;
+                    }
+
+                    // Move to next
+                    const nextId = flow[idx + 1];
+                    if (nextId) $(nextId).focus();
+                });
+            });
+
+            /* =====================================================
+                SAVE STOCK
+                ✅ UPDATED: Mouse fix + Product selection persistence
+            ===================================================== */
+            async function saveStock() {
+                const btn = $("addBtn");
+                btn.disabled = true;
+                if (!selected) {
+                    alert("Select a product first");
+                    $('prodSearch').focus();
+                    btn.disabled = false;
+                    return;
+                }
+
+                let qtyRaw = $('qty').value.trim();
+                let ppRaw = $('purchase_price').value.trim();
+                let pd = $('purchase_date').value.trim();
+
+                if (!qtyRaw || !ppRaw || !pd) {
+                    alert("Fill all mandatory fields");
+                    btn.disabled = false;
+                    return;
+                }
+
+                if (isNaN(Date.parse(pd))) {
+                    alert("Invalid purchase date");
+                    $("purchase_date").focus();
+                    btn.disabled = false;
+                    return;
+                }
+                let qty = Number(qtyRaw);
+
+                if (currentUnit === "pc" && !Number.isInteger(qty)) {
+                    alert("Pieces cannot have decimals.");
+                    $("qty").focus();
+                    btn.disabled = false;
+                    return;
+                }
+                if (isNaN(qty) || qty <= 0) {
+                    alert("Invalid quantity");
+                    $('qty').focus();
+                    btn.disabled = false;
+                    return;
+                }
+
+                const purchase_price_total = Number(ppRaw);
+                if (isNaN(purchase_price_total) || purchase_price_total <= 0) {
+                    alert("Enter valid purchase amount");
+                    $('purchase_price').focus();
+                    btn.disabled = false;
+                    return;
+                }
+
+                let extraRaw = $('extra_expenses').value.trim();
+                let extra = 0;
+
+                if (extraRaw !== "") {
+                    extra = Number(extraRaw);
+                    if (isNaN(extra) || extra < 0) {
+                        alert("Invalid extra expenses");
+                        $("extra_expenses").focus();
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+
+                const payload = {
+                    product_id: selected.id,
+                    qty: qty,
+                    purchase_price: purchase_price_total,
+                    extra_expenses: extra,
+                    expiry_date: $('expiry_date').value || null,
+                    purchased_from: $('purchased_from').value.trim(),
+                    purchase_date: pd
+                };
+
+                try {
+                    const r = await fetch("http://localhost:3000/add-stock", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!r.ok) {
+                        const txt = await r.text().catch(() => null);
+                        alert("Server error: " + (txt || r.statusText));
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    const data = await r.json();
+                    alert(
+                        "Stock Updated!\nNew stock: " + data.new_stock +
+                        "\nPer-unit purchase price: ₹" + data.per_unit_purchase_price
+                    );
+                    btn.disabled = false;
+                    
+                    // ✅ MOUSE FIX: Ensure pointer events are enabled after save
+                    document.body.style.pointerEvents = 'auto';
+                    
+                    // ✅ update selected product data (NO reload)
+                    selected.stock_qty = data.new_stock;
+                    selected.purchase_price = data.per_unit_purchase_price;
+
+                    // refresh info UI
+                    showProductInfo();
+                    const cost = Number(selected.purchase_price);
+
+                    if (
+                        selected.retail_price <= cost ||
+                        selected.wholesale_price <= cost ||
+                        (selected.special_price !== null && selected.special_price <= cost)
+                    ) {
+                        alert(
+                            "⚠ PRICE UPDATE REQUIRED\n\n" +
+                            "Purchase price is ₹" + cost + "\n\n" +
+                            "One or more selling prices are not greater than purchase price.\n" +
+                            "Please update Retail / Wholesale / Special price before selling."
+                        );
+                    }
+                    
+                    // clear inputs for next entry
+                    $("qty").value = "";
+                    $("purchase_price").value = "";
+                    $("extra_expenses").value = "";
+                    $("expiry_date").value = "";
+                    $("purchased_from").value = "";
+
+                    // ✅ PRODUCT SELECTION PERSISTENCE: Keep product selected
+                    // User can continue adding stock for same product
+                    // Product info remains visible
+                    
+                    // focus back to quantity
+                    $("qty").focus();
+                } catch (err) {
+                    alert("Network error: " + err.message);
+                    btn.disabled = false;
+                    // ✅ MOUSE FIX: Re-enable pointer events on error too
+                    document.body.style.pointerEvents = 'auto';
+                }
+            }
+
+            /* =====================================================
+                UPDATE SELL PRICE
+                ✅ UPDATED: New price entry flow with proper Enter key navigation
+            ===================================================== */
+            $('updatePriceBtn').onclick = updatePrice;
+            
+            /* ✅ NEW: Price Entry Flow - Retail → Wholesale → Special → Min Qty → Save */
+            $("newRetail").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    $("newWholesale").focus();
+                }
+            });
+
+            $("newWholesale").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    $("newSpecial").focus(); // ✅ Go to Special Price, NOT save
+                }
+            });
+            
+            $("newSpecial").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    $("minWholesaleQty").focus(); // ✅ Go to Min Wholesale Qty
+                }
+            });
+            
+            $("minWholesaleQty").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    updatePrice(); // ✅ NOW save
+                }
+            });
+            
+            async function updatePrice() {
+                const btn = $("updatePriceBtn");
+                btn.disabled = true;
+                if (!selected) {
+                    alert("Select product");
+                    btn.disabled = false;
+                    return;
+                }
+
+                const minQtyRaw = $("minWholesaleQty").value.trim();
+
+                const payload = {
+                    id: selected.id
+                };
+                const cost = Number(selected.purchase_price);
+
+                // Retail validation
+                if ($("newRetail").value.trim() !== "") {
+                    const r = Number($("newRetail").value);
+                    if (isNaN(r) || r <= 0) {
+                        alert("Retail price must be greater than 0");
+                        $("newRetail").focus();
+                        btn.disabled = false;
+                        return;
+                    }
+                    if (r <= cost) {
+                        alert("Retail price must be GREATER than purchase price (₹" + cost + ")");
+                        $("newRetail").focus();
+                        btn.disabled = false;
+                        return;
+                    }
+                    payload.retail_price = r;
+                }
+
+                // Wholesale validation
+                if ($("newWholesale").value.trim() !== "") {
+                    const w = Number($("newWholesale").value);
+                    if (isNaN(w) || w <= 0) {
+                        alert("Wholesale price must be greater than 0");
+                        $("newWholesale").focus();
+                        btn.disabled = false;
+                        return;
+                    }
+                    if (w <= cost) {
+                        alert("Wholesale price must be GREATER than purchase price (₹" + cost + ")");
+                        $("newWholesale").focus();
+                        btn.disabled = false;
+                        return;
+                    }
+                    payload.wholesale_price = w;
+                }
+
+                // Special validation
+                if ($("newSpecial").value.trim() !== "") {
+                    const s = Number($("newSpecial").value);
+                    if (isNaN(s) || s <= 0) {
+                        alert("Special price must be greater than 0");
+                        $("newSpecial").focus();
+                        btn.disabled = false;
+                        return;
+                    }
+                    if (s <= cost) {
+                        alert("Special price must be GREATER than purchase price (₹" + cost + ")");
+                        $("newSpecial").focus();
+                        btn.disabled = false;
+                        return;
+                    }
+                    payload.special_price = s;
+                }
+                
+                // Min Wholesale Qty validation
+                if (minQtyRaw !== "") {
+                    const n = Number(minQtyRaw);
+                    if (isNaN(n) || n <= 0) {
+                        alert("Min Wholesale Qty must be greater than 0");
+                        $("minWholesaleQty").focus();
+                        btn.disabled = false;
+                        return;
+                    }
+                    payload.wholesale_min_qty = n;
+                }
+                
+                if (
+                    $("newSpecial").value.trim() !== "" &&
+                    $("newRetail").value.trim() !== "" &&
+                    Number($("newSpecial").value) >= Number($("newRetail").value)
+                ) {
+                    alert("Special price must be less than retail price");
+                    $("newSpecial").focus();
+                    btn.disabled = false;
+                    return;
+                }
+                
+                try {
+                    await fetch("http://localhost:3000/update-price", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    alert("Price Updated!");
+                    btn.disabled = false;
+                    
+                    if (payload.retail_price !== undefined) {
+                        selected.retail_price = payload.retail_price;
+                    }
+
+                    if (payload.wholesale_price !== undefined) {
+                        selected.wholesale_price = payload.wholesale_price;
+                    }
+
+                    if (payload.special_price !== undefined) {
+                        selected.special_price = payload.special_price;
+                    }
+
+                    if (payload.wholesale_min_qty !== undefined) {
+                        selected.wholesale_min_qty = payload.wholesale_min_qty;
+                    }
+
+                    // refresh product info card
+                    showProductInfo();
+                    $("newRetail").value = "";
+                    $("newWholesale").value = "";
+                    $("minWholesaleQty").value = "";
+                    $("newSpecial").value = "";
+                    
+                    // ✅ MOUSE FIX: Re-enable pointer events after save
+                    document.body.style.pointerEvents = 'auto';
+                    
+                    $("qty").focus();
+
+                } catch (err) {
+                    alert("Network error: " + err.message);
+                    btn.disabled = false;
+                    // ✅ MOUSE FIX: Re-enable pointer events on error too
+                    document.body.style.pointerEvents = 'auto';
+                }
+            }
+            /* =====================================================
+                PURCHASE HISTORY NAVIGATION
+                ✅ UPDATED: Product selection persistence when returning
+            ===================================================== */
+            function openPurchaseHistory(productId) {
+                if (!productId) {
+                    alert("Product ID missing");
+                    return;
+                }
+
+                // ✅ Save current product selection to sessionStorage
+                if (selected) {
+                    sessionStorage.setItem('addStock_selectedProductId', selected.id);
+                    sessionStorage.setItem('addStock_selectedProductName', selected.name);
+                }
+
+                window.location.href =
+                    `purchase-history.html?product_id=${productId}`;
+            }
+            
+            /* ✅ NEW: Restore product selection when returning from purchase history */
+            window.addEventListener("load", () => {
+                const input = document.getElementById("prodSearch");
+                if (input) input.focus();
+                
+                // Check if we're returning from purchase history
+                const savedProductId = sessionStorage.getItem('addStock_selectedProductId');
+                const savedProductName = sessionStorage.getItem('addStock_selectedProductName');
+                
+                if (savedProductId && savedProductName && products.length > 0) {
+                    // Wait for products to load, then restore selection
+                    const checkProducts = setInterval(() => {
+                        if (products.length > 0) {
+                            clearInterval(checkProducts);
+                            
+                            const product = products.find(p => p.id == savedProductId);
+                            if (product) {
+                                selected = product;
+                                currentUnit = product.unit;
+                                document.getElementById('prodSearch').value = product.name;
+                                showProductInfo();
+                                
+                                // Clear sessionStorage after restoring
+                                sessionStorage.removeItem('addStock_selectedProductId');
+                                sessionStorage.removeItem('addStock_selectedProductName');
+                            }
+                        }
+                    }, 100);
+                    
+                    // Timeout after 3 seconds
+                    setTimeout(() => clearInterval(checkProducts), 3000);
+                }
+            });
+        </script>
+
+        <!-- Real-time Client -->
+        <script src="realtimeClient.js"></script>
+        <script>
+            // ========== REAL-TIME UPDATES ==========
+            if (window.realtimeClient) {
+                // Reload products when they're updated
+                realtimeClient.on('product:added', async (data) => {
+                    console.log('Product added, reloading products...');
+                    try {
+                        const r = await fetch("http://localhost:3000/products");
+                        products = await r.json();
+                        
+                        // Refresh search if needed
+                        if (selected) {
+                            const updated = products.find(p => p.id === selected.id);
+                            if (updated) {
+                                selected = updated;
+                                showProductInfo();
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to reload products:', e);
+                    }
+                });
+
+                realtimeClient.on('stock:added', async (data) => {
+                    console.log('Stock added, reloading products...');
+                    try {
+                        const r = await fetch("http://localhost:3000/products");
+                        products = await r.json();
+                        
+                        // Refresh current product if it matches
+                        if (selected && data.product_id === selected.id) {
+                            const updated = products.find(p => p.id === selected.id);
+                            if (updated) {
+                                selected = updated;
+                                showProductInfo();
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to reload products:', e);
+                    }
+                });
+
+                realtimeClient.on('price:updated', async (data) => {
+                    console.log('Price updated, reloading products...');
+                    try {
+                        const r = await fetch("http://localhost:3000/products");
+                        products = await r.json();
+                        
+                        // Refresh current product if it matches
+                        if (selected && data.id === selected.id) {
+                            const updated = products.find(p => p.id === selected.id);
+                            if (updated) {
+                                selected = updated;
+                                showProductInfo();
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to reload products:', e);
+                    }
+                });
+            }
+        </script>
+</body>
+
+</html>

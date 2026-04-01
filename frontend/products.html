@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Inventory — Punchiri Stores</title>
+    
+    <style>
+        /* ============ CSS RESET & BASE ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --secondary-dark: #0d9668;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --light-danger: #fee2e2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--gray-900);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ============ HEADER & CONTROLS ============ */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .header-left h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-left h1::before {
+            content: "📦";
+            font-size: 1.8rem;
+        }
+
+        .header-left p {
+            color: var(--gray-700);
+            font-size: 0.95rem;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .stats-card {
+            background: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .stats-card .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stats-card .icon.products {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+        }
+
+        .stats-card .icon.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+
+        .stats-card .details h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.125rem;
+        }
+
+        .stats-card .details p {
+            font-size: 0.8rem;
+            color: var(--gray-700);
+        }
+
+        /* ============ CONTROLS BAR ============ */
+        .controls-bar {
+            background: white;
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--gray-200);
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-container::before {
+            content: "🔍";
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 1rem;
+        }
+
+        #searchBox {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: var(--gray-50);
+        }
+
+        #searchBox:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: white;
+        }
+
+        .controls-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+            transform: translateY(-1px);
+        }
+
+        /* ============ TABLE STYLES ============ */
+        .table-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--gray-50) 0%, #fff 100%);
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        th {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            border-right: 1px solid var(--gray-200);
+            transition: background 0.2s;
+        }
+
+        th:hover {
+            background: var(--gray-100);
+        }
+
+        th:last-child {
+            border-right: none;
+        }
+
+        th.sortable::after {
+            content: " ↕";
+            opacity: 0.5;
+            display: inline-block;
+            margin-left: 0.25rem;
+            transition: transform 0.2s;
+        }
+
+        th.sortable.asc::after {
+            content: " ↑";
+            opacity: 1;
+        }
+
+        th.sortable.desc::after {
+            content: " ↓";
+            opacity: 1;
+        }
+
+        td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: var(--gray-50);
+        }
+
+        /* ============ TABLE CELL SPECIFIC ============ */
+        .product-id {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .nameCell {
+            font-weight: 500;
+            color: var(--gray-900);
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: var(--radius-sm);
+        }
+
+        .nameCell:hover {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .nameCell.editing {
+            padding: 0;
+        }
+
+        .nameCell input {
+            width: 100%;
+            border: 2px solid var(--primary);
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            background: white;
+            outline: none;
+        }
+
+        .price-cell {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-weight: 500;
+        }
+
+        .price-cell::before {
+            content: "₹";
+            font-size: 0.85em;
+            margin-right: 2px;
+            opacity: 0.7;
+        }
+
+        /* ============ STOCK STATUS ============ */
+        .stock-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stock-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stock-low .stock-badge {
+            background: var(--light-danger);
+            color: #991b1b;
+        }
+
+        .stock-medium .stock-badge {
+            background: var(--warning-light);
+            color: #92400e;
+        }
+
+        .stock-good .stock-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-dark);
+        }
+
+        /* ============ STATUS COLUMN ============ */
+        .status-toggle {
+            width: 36px;
+            height: 20px;
+            background: var(--gray-300);
+            border-radius: 999px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .status-toggle::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .status-toggle.active {
+            background: var(--secondary);
+        }
+
+        .status-toggle.active::after {
+            transform: translateX(16px);
+        }
+
+        /* ============ ACTIONS MENU ============ */
+        .actions-cell {
+            text-align: center;
+        }
+
+        .btn-edit-barcode {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-edit-barcode:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* ============ EDIT BARCODE MODAL ============ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--gray-900);
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--gray-700);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn-cancel {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .modal-btn-cancel:hover {
+            background: var(--gray-200);
+        }
+
+        .modal-btn-save {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-btn-save:hover {
+            background: #2563eb;
+        }
+
+        /* ============ INACTIVE ROW ============ */
+        .inactiveRow td {
+            opacity: 0.4;
+            background: var(--gray-100) !important;
+        }
+
+        .inactiveRow:hover td {
+            background: var(--gray-200) !important;
+        }
+
+        /* ============ FOOTER ============ */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--gray-200);
+            margin-top: 2rem;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ============ RESPONSIVE DESIGN ============ */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .controls-bar {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                max-width: 100%;
+            }
+            
+            .stats-card {
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        /* ============ PRINT STYLES ============ */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+            
+            .header-right,
+            .controls-bar,
+            .status-toggle,
+            button {
+                display: none !important;
+            }
+            
+            .table-container {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+            
+            th {
+                background: #f0f0f0 !important;
+                color: #000 !important;
+                print-color-adjust: exact;
+-webkit-print-color-adjust: exact;
+            }
+            
+            .inactiveRow td {
+                opacity: 0.6;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="header-left">
+                <h1>Product Inventory</h1>
+                <p>Manage your product catalog, pricing, and stock levels</p>
+            </div>
+            <div class="header-right">
+                <div class="stats-card">
+                    <div class="icon products">
+                        📦
+                    </div>
+                    <div class="details">
+                        <h3 id="totalProducts">0</h3>
+                        <p>Total Products</p>
+                    </div>
+                </div>
+                <div class="stats-card">
+                    <div class="icon active">
+                        ✅
+                    </div>
+                    <div class="details">
+                        <h3 id="activeProducts">0</h3>
+                        <p>Active</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls-bar">
+            <div class="search-container">
+                <input id="searchBox" type="text" placeholder="Search products by name, barcode, or retail price...">
+            </div>
+            <div class="controls-buttons">
+                <button onclick="printProducts()" class="btn btn-primary">
+                    📄 Download PDF
+                </button>
+                <button onclick="exportToCSV()" class="btn btn-secondary">
+                    📊 Export CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th id="sortId" class="sortable">ID</th>
+                        <th id="sortName" class="sortable">Product Name</th>
+                        <th>Barcode</th>
+                        <th id="sortUnit" class="sortable">Unit</th>
+                        <th>Retail Price</th>
+                        <th>Wholesale Price</th>
+<th>Special Price</th>
+<th id="sortStock" class="sortable">Stock Level</th>
+                        <th id="sortStatus" class="sortable">Status</th>
+                        <th style="width: 100px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2024 Punchiri Stores. All rights reserved. | 
+                <a href="#" onclick="event.preventDefault(); loadProducts()">Refresh Data</a> | 
+                System v2.1
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ============ ORIGINAL FUNCTIONALITY STARTS HERE ============
+        // All functions remain exactly the same as provided
+        // Only UI/UX enhancements have been added
+
+        let allProducts = [];
+        let currentSort = { key: null, asc: true };
+
+        /* ======================
+           LOAD PRODUCTS
+        ====================== */
+        async function loadProducts() {
+    try {
+        const res = await fetch("http://localhost:3000/products/all");
+
+        if (!res.ok) {
+            console.error("Failed to load products");
+            return;
+        }
+
+        allProducts = await res.json();
+
+        if (!Array.isArray(allProducts)) {
+            console.error("Invalid product data");
+            return;
+        }
+
+        allProducts.sort((a, b) => a.id - b.id);
+
+        document.getElementById('totalProducts').textContent = allProducts.length;
+        const activeCount = allProducts.filter(p => p.active == 1).length;
+        document.getElementById('activeProducts').textContent = activeCount;
+
+        renderTable(allProducts);
+        updateSortIndicators();
+
+    } catch (err) {
+        console.error("Product load error:", err);
+    }
+}
+
+        /* ======================
+           RENDER TABLE
+        ====================== */
+        function renderTable(list) {
+            let rows = "";
+
+            list.forEach(p => {
+                const qty = Number(p.stock_qty);
+                let stockClass = '';
+                let stockLabel = '';
+                
+                if (qty <= 5) {
+                    stockClass = 'stock-low';
+                    stockLabel = 'Low';
+                } else if (qty < 50) {
+                    stockClass = 'stock-medium';
+                    stockLabel = 'Medium';
+                } else {
+                    stockClass = 'stock-good';
+                    stockLabel = 'Good';
+                }
+
+                const rowClass = p.active == 0 ? "inactiveRow" : "";
+                
+                rows += `
+                    <tr class="${rowClass}">
+                        <td class="product-id">${p.id}</td>
+                        <td class="nameCell" data-id="${p.id}">${p.name}</td>
+                        <td style="font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; font-size: 0.85rem; color: var(--gray-600);">${p.barcode || '-'}</td>
+                        <td>${p.unit}</td>
+                        <td class="price-cell">${p.retail_price}</td>
+                        <td class="price-cell">${p.wholesale_price}</td>
+<td class="price-cell">${p.special_price ?? '-'}</td>
+<td class="${stockClass}">
+                            <div class="stock-cell">
+                                <div class="stock-badge">${stockLabel}</div>
+                                ${formatStock(p.stock_qty, p.unit)}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status-toggle ${p.active ? 'active' : ''}" 
+                                 onclick="toggleActive(${p.id})"
+                                 title="${p.active ? 'Active - Click to deactivate' : 'Inactive - Click to activate'}">
+                            </div>
+                        </td>
+                        <td class="actions-cell">
+                            <button class="btn-edit-barcode" onclick="openEditBarcodeModal(${p.id}, '${(p.barcode || '').replace(/'/g, "\\'")}')">
+                                ✏️ Edit Barcode
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById("productTable").innerHTML = rows;
+        }
+
+        /* ======================
+           FORMAT STOCK
+        ====================== */
+        function formatStock(q, unit) {
+    q = Number(q);
+
+    if (isNaN(q)) q = 0;
+
+    if (unit === "pc") return Math.round(q) + " pcs";
+
+    return Number.isInteger(q) ? q + " kg" : q.toFixed(3) + " kg";
+}
+
+        /* ======================
+           SEARCH FUNCTIONALITY
+        ====================== */
+        const searchBox = document.getElementById("searchBox");
+        
+        // Handle Enter key for barcode scanning
+        searchBox.addEventListener("keydown", function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const q = this.value.trim().toUpperCase();
+                
+                if (!q) return;
+                
+                // Search for exact barcode match
+                const product = allProducts.find(p => 
+                    String(p.barcode || "").toUpperCase() === q
+                );
+                
+                if (product) {
+                    // Filter to show only this product
+                    renderTable([product]);
+                    // Show notification
+                    showNotification(`Product found: ${product.name}`, 'success');
+                } else {
+                    // Perform regular search
+                    searchBox.dispatchEvent(new Event('input'));
+                }
+            }
+        });
+        
+        searchBox.addEventListener("input", function () {
+            const q = this.value.trim().toLowerCase();
+
+            if (!q) {
+                renderTable(allProducts);
+                return;
+            }
+
+            const isNumber = /^\d+(\.\d+)?$/.test(q);
+            let starts = [];
+            let contains = [];
+
+            allProducts.forEach(p => {
+                const name = String(p.name || "").toLowerCase();
+                const barcode = String(p.barcode || "").toLowerCase();
+
+                // Always check barcode first (works for both numbers and text)
+                if (barcode === q) {
+                    starts.unshift(p); // Highest priority
+                } else if (barcode.includes(q)) {
+                    starts.push(p);
+                } else if (isNumber && Number(p.retail_price) === Number(q)) {
+                    // Check price only if no barcode match
+                    starts.push(p);
+                } else if (name.startsWith(q)) {
+                    starts.push(p);
+                } else if (name.includes(q)) {
+                    contains.push(p);
+                }
+            });
+
+            renderTable(starts.concat(contains));
+        });
+        
+        // Notification helper function
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; 
+                top: 20px; 
+                right: 20px; 
+                background: ${type === 'success' ? '#10b981' : '#ef4444'}; 
+                color: white; 
+                padding: 12px 20px; 
+                border-radius: 8px; 
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+                z-index: 9999;
+                font-weight: 500;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        /* ======================
+           SORTING
+        ====================== */
+        document.getElementById("sortId").addEventListener("click", () => sortBy("id", true));
+        document.getElementById("sortName").addEventListener("click", () => sortBy("name"));
+        document.getElementById("sortStock").addEventListener("click", () => sortBy("stock_qty", true));
+        document.getElementById("sortUnit").addEventListener("click", () => sortBy("unit"));
+        document.getElementById("sortStatus").addEventListener("click", () => sortBy("active", true));
+
+        function sortBy(key, isNumber = false) {
+            // Toggle if same column
+            if (currentSort.key === key) {
+                currentSort.asc = !currentSort.asc;
+            } else {
+                currentSort.key = key;
+                currentSort.asc = true;
+            }
+
+            const sorted = [...allProducts].sort((a, b) => {
+                let v1 = a[key];
+                let v2 = b[key];
+
+                if (isNumber) {
+                    v1 = Number(v1);
+                    v2 = Number(v2);
+                } else {
+                    v1 = String(v1).toLowerCase();
+                    v2 = String(v2).toLowerCase();
+                }
+
+                if (v1 < v2) return currentSort.asc ? -1 : 1;
+                if (v1 > v2) return currentSort.asc ? 1 : -1;
+                return 0;
+            });
+
+            renderTable(sorted);
+            updateSortIndicators();
+        }
+
+        function updateSortIndicators() {
+            // Remove all sort classes
+            document.querySelectorAll('.sortable').forEach(th => {
+                th.classList.remove('asc', 'desc');
+            });
+            
+            // Add current sort class
+            if (currentSort.key) {
+                const thId = currentSort.key === 'id' ? 'sortId' :
+                            currentSort.key === 'name' ? 'sortName' :
+                            currentSort.key === 'stock_qty' ? 'sortStock' :
+                            currentSort.key === 'unit' ? 'sortUnit' :
+                            currentSort.key === 'active' ? 'sortStatus' : null;
+                
+                if (thId) {
+                    const th = document.getElementById(thId);
+                    th.classList.add(currentSort.asc ? 'asc' : 'desc');
+                }
+            }
+        }
+
+        /* ======================
+           INLINE EDITING
+        ====================== */
+        document.addEventListener("dblclick", function (e) {
+            const cell = e.target.closest(".nameCell");
+            if (!cell) return;
+
+            const id = cell.dataset.id;
+            const oldName = cell.textContent.trim();
+
+            if (cell.classList.contains("editing")) return;
+
+            cell.classList.add("editing");
+            cell.innerHTML = `<input type="text" value="${oldName}">`;
+
+            const input = cell.querySelector("input");
+            input.focus();
+            input.select();
+
+            let saved = false;
+
+            async function save() {
+                if (saved) return;
+                saved = true;
+
+                const newName = input.value.trim();
+
+                if (!newName || newName === oldName) {
+                    cell.textContent = oldName;
+                    cell.classList.remove("editing");
+                    return;
+                }
+
+                try {
+                    const res = await fetch("http://localhost:3000/update-product-name", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id, name: newName })
+                    });
+
+                    let data;
+
+try {
+    data = await res.json();
+} catch {
+    data = {};
+}
+
+if (!res.ok) {
+    alert(data.error || "Failed to update name");
+    cell.textContent = oldName;
+} else {
+    cell.textContent = newName;
+}
+                } catch (err) {
+                    alert("Network error");
+                    cell.textContent = oldName;
+                }
+
+                cell.classList.remove("editing");
+            }
+
+            input.addEventListener("keydown", e => {
+                if (e.key === "Enter") save();
+                if (e.key === "Escape") {
+                    cell.textContent = oldName;
+                    cell.classList.remove("editing");
+                }
+            });
+
+            input.addEventListener("blur", save);
+        });
+
+        /* ======================
+           TOGGLE ACTIVE STATUS
+        ====================== */
+        async function toggleActive(id) {
+            if (!confirm("Change product active status?")) return;
+
+            try {
+                await fetch("http://localhost:3000/product/toggle-active", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id })
+                });
+
+                loadProducts();
+            } catch (e) {
+                alert("Failed to update status");
+            }
+        }
+
+        /* ======================
+           PRINT/PDF FUNCTION
+        ====================== */
+        function printProducts() {
+            window.print();
+        }
+
+        /* ======================
+           ADDITIONAL EXPORT FUNCTION (UI ENHANCEMENT)
+        ====================== */
+        function exportToCSV() {
+            const headers = ['ID', 'Name', 'Unit', 'Retail Price', 'Wholesale Price', 'Special Price', 'Stock Qty', 'Status'];
+            const csvContent = [
+                headers.join(','),
+                ...allProducts.map(p => [
+                    p.id,
+                    `"${p.name}"`,
+                    p.unit,
+                    p.retail_price,
+                    p.wholesale_price,
+                    p.special_price ?? '',
+                    p.stock_qty,
+                    p.active ? 'Active' : 'Inactive'
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `products_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            // Show success feedback
+            const originalText = document.querySelector('.btn-secondary').innerHTML;
+            document.querySelector('.btn-secondary').innerHTML = '✅ Exported!';
+            setTimeout(() => {
+                document.querySelector('.btn-secondary').innerHTML = originalText;
+            }, 2000);
+        }
+
+        // Load products on page load
+        loadProducts();
+
+        // ========== REAL-TIME UPDATES ==========
+        // Listen for product updates
+        if (window.realtimeClient) {
+            realtimeClient.on('product:added', (data) => {
+                console.log('Product added:', data);
+                loadProducts(); // Refresh product list
+            });
+
+            realtimeClient.on('product:updated', (data) => {
+                console.log('Product updated:', data);
+                loadProducts(); // Refresh product list
+            });
+
+            realtimeClient.on('stock:added', (data) => {
+                console.log('Stock added:', data);
+                loadProducts(); // Refresh to show updated stock
+            });
+
+            realtimeClient.on('price:updated', (data) => {
+                console.log('Price updated:', data);
+                loadProducts(); // Refresh to show updated prices
+            });
+        }
+    </script>
+
+    <!-- Real-time Client -->
+    <script src="realtimeClient.js"></script>
+
+    <!-- Edit Barcode Modal -->
+    <div class="modal-overlay" id="editBarcodeModal">
+        <div class="modal-content">
+            <div class="modal-header">Edit Barcode</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Barcode</label>
+                    <input type="text" id="barcodeInput" class="form-input" placeholder="Enter barcode">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" onclick="closeEditBarcodeModal()">Cancel</button>
+                <button class="modal-btn modal-btn-save" onclick="saveBarcodeEdit()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variable to store current editing product ID
+        let currentEditingProductId = null;
+
+        // Open edit barcode modal
+        function openEditBarcodeModal(productId, currentBarcode) {
+            currentEditingProductId = productId;
+            document.getElementById('barcodeInput').value = currentBarcode || '';
+            document.getElementById('editBarcodeModal').classList.add('show');
+            
+            // Focus on input
+            setTimeout(() => {
+                document.getElementById('barcodeInput').focus();
+            }, 100);
+        }
+
+        // Close edit barcode modal
+        function closeEditBarcodeModal() {
+            document.getElementById('editBarcodeModal').classList.remove('show');
+            currentEditingProductId = null;
+        }
+
+        // Save barcode edit
+        async function saveBarcodeEdit() {
+            if (!currentEditingProductId) return;
+            
+            const newBarcode = document.getElementById('barcodeInput').value.trim();
+            
+            // Frontend validation: Check if barcode already exists
+            if (newBarcode) {
+                const existingProduct = allProducts.find(p => 
+                    p.barcode === newBarcode && p.id !== currentEditingProductId
+                );
+                
+                if (existingProduct) {
+                    alert(`Error: Barcode "${newBarcode}" already exists for product "${existingProduct.name}"`);
+                    return;
+                }
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:3000/products/${currentEditingProductId}/barcode`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ barcode: newBarcode })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    alert(data.error || 'Failed to update barcode');
+                    return;
+                }
+                
+                // Close modal
+                closeEditBarcodeModal();
+                
+                // Reload products to reflect changes
+                loadProducts();
+                
+                // Show success message
+                showNotification('Barcode updated successfully!', 'success');
+            } catch (error) {
+                console.error('Error updating barcode:', error);
+                alert('Network error. Please try again.');
+            }
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeEditBarcodeModal();
+            }
+        });
+
+        // Save on Enter key in input
+        document.getElementById('barcodeInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                saveBarcodeEdit();
+            }
+        });
+    </script>
+</body>
+</html>

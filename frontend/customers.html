@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer OB Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ====== RESET & BASE STYLES ====== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --danger-color: #ef4444;
+            --danger-dark: #dc2626;
+            --warning-color: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --transition: all 0.2s ease-in-out;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--gray-800);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* ====== LAYOUT CONTAINER ====== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* ====== HEADER STYLES ====== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-text h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .system-info {
+            display: flex;
+            gap: 20px;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-item i {
+            color: var(--primary-color);
+        }
+
+        /* ====== MAIN CARD STYLES ====== */
+        .card {
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--gray-200);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-xl);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--primary-color);
+        }
+
+        .card-subtitle {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+
+        /* ====== ADD CUSTOMER FORM ====== */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .required:after {
+            content: "*";
+            color: var(--danger-color);
+            margin-left: 4px;
+        }
+
+        .form-input {
+            padding: 10px 14px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--danger-color);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            border: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-success {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: var(--secondary-dark);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-dark);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .error-message {
+    color: var(--danger-color);
+    font-size: 0.8rem;
+    margin-top: 4px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    visibility: hidden;   /* 👈 ADD THIS */
+}
+
+        /* ====== SEARCH BAR ====== */
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-lg);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        /* ====== TABLE STYLES ====== */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .data-table th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table th:last-child {
+            border-right: none;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid var(--gray-100);
+            transition: var(--transition);
+        }
+
+        .data-table tbody tr:hover {
+            background-color: var(--gray-50);
+        }
+
+        .data-table td {
+            padding: 16px;
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        .data-table td:first-child {
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .customer-name {
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        .ob-amount {
+            font-weight: 600;
+            color: var(--gray-900);
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', monospace;
+        }
+
+        .ob-positive {
+            color: var(--secondary-dark);
+        }
+
+        .ob-negative {
+            color: var(--danger-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .edit-btn {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .edit-btn:hover {
+            background: rgba(37, 99, 235, 0.2);
+        }
+
+        .settle-btn {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .settle-btn:hover {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .expand-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .expand-btn:hover {
+            background: var(--gray-200);
+            transform: rotate(90deg);
+        }
+
+        .expand-btn.expanded {
+            background: var(--primary-color);
+            color: white;
+            transform: rotate(180deg);
+        }
+
+        /* ====== SETTLEMENTS EXPANDED ROW ====== */
+        .settlements-container {
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
+            padding: 20px;
+        }
+
+        .settlements-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .settlements-title {
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .no-settlements {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray-500);
+        }
+
+        .no-settlements i {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: var(--gray-300);
+        }
+
+        /* ====== MODAL STYLES ====== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-500);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .settlement-info {
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--gray-900);
+            font-size: 1.1rem;
+        }
+
+        .new-ob {
+            color: var(--secondary-color);
+        }
+
+        .amount-input-container {
+            margin-bottom: 24px;
+        }
+
+        .amount-input-label {
+            display: block;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            transition: var(--transition);
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', monospace;
+        }
+
+        .amount-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* ====== STATS CARDS ====== */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card.total-customers {
+            border-left-color: var(--primary-color);
+        }
+
+        .stat-card.total-ob {
+            border-left-color: var(--secondary-color);
+        }
+
+        .stat-card.positive-ob {
+            border-left-color: #10b981;
+        }
+
+        .stat-card.negative-ob {
+            border-left-color: #ef4444;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        /* ====== FOOTER ====== */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--gray-500);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--gray-200);
+            margin-top: 40px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .footer-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* ====== RESPONSIVE DESIGN ====== */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .system-info {
+                flex-wrap: wrap;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .data-table th, 
+            .data-table td {
+                padding: 12px 8px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .modal-content {
+                margin: 10px;
+            }
+        }
+
+        /* ====== KEYBOARD SHORTCUT HINT ====== */
+        .shortcut-hint {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .shortcut-key {
+            background: var(--gray-200);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-family: monospace;
+            font-size: 0.7rem;
+        }
+
+        /* ====== LOADING STATES ====== */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .loading:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-300);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        /* ====== EMPTY STATE ====== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-500);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            color: var(--gray-300);
+            margin-bottom: 16px;
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+        }
+
+        .empty-state-description {
+            max-width: 400px;
+            margin: 0 auto 20px;
+        }
+
+        /* ====== PRINT RECEIPT STYLES ====== */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .receipt-print, .receipt-print * {
+                visibility: visible;
+            }
+            
+            .receipt-print {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-users-cog"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Customer OB Management System</h1>
+                    <p>Manage customer opening balances, settlements, and transactions</p>
+                </div>
+            </div>
+            <div class="system-info">
+                <div class="info-item">
+                    <i class="fas fa-database"></i>
+                    <span>Total Customers: <strong id="totalCustomers">0</strong></span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-balance-scale"></i>
+                    <span>Total OB: <strong id="totalOB">₹0</strong></span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    <span id="currentDateTime">Loading...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="stats-container">
+            <div class="stat-card total-customers">
+                <div class="stat-title">
+                    <i class="fas fa-users"></i>
+                    Total Customers
+                </div>
+                <div class="stat-value" id="statTotalCustomers">0</div>
+            </div>
+            <div class="stat-card total-ob">
+                <div class="stat-title">
+                    <i class="fas fa-rupee-sign"></i>
+                    Total Opening Balance
+                </div>
+                <div class="stat-value" id="statTotalOB">₹0</div>
+            </div>
+            <div class="stat-card positive-ob">
+                <div class="stat-title">
+                    <i class="fas fa-arrow-up"></i>
+                    Positive Balance
+                </div>
+                <div class="stat-value" id="statPositiveOB">₹0</div>
+            </div>
+            <div class="stat-card negative-ob">
+                <div class="stat-title">
+                    <i class="fas fa-arrow-down"></i>
+                    Negative Balance
+                </div>
+                <div class="stat-value" id="statNegativeOB">₹0</div>
+            </div>
+        </div>
+
+        <!-- Add Customer Card -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">
+                        <i class="fas fa-user-plus"></i>
+                        Add New Customer
+                    </div>
+                    <div class="card-subtitle">Fill in customer details to add to the system</div>
+                </div>
+                <div class="shortcut-hint">
+                    <span>Press <span class="shortcut-key">Shift + Enter</span> in OB field to save</span>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label required">
+                        <i class="fas fa-user"></i>
+                        Customer Name
+                    </label>
+                    <input type="text" id="name" class="form-input" placeholder="Enter customer full name">
+                    <div class="error-message" id="nameError">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Name already exists
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-mobile-alt"></i>
+                        Mobile Number
+                    </label>
+                    <input type="text" id="mobile" class="form-input" placeholder="10-digit mobile number">
+                    <div class="error-message" id="mobileError">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Mobile must be 10 digits
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label required">
+                        <i class="fas fa-rupee-sign"></i>
+                        Opening Balance
+                    </label>
+                    <input type="number" id="ob" class="form-input" placeholder="Enter amount">
+                    <div class="error-message" id="obError">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Opening balance is required
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="addCustomer()">
+                    <i class="fas fa-plus-circle"></i>
+                    Add Customer
+                </button>
+                <button class="btn btn-secondary" onclick="clearForm()">
+                    <i class="fas fa-eraser"></i>
+                    Clear Form
+                </button>
+            </div>
+        </div>
+
+        <!-- Search and Customers Table Card -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">
+                        <i class="fas fa-list"></i>
+                        Customer List
+                    </div>
+                    <div class="card-subtitle">Double-click on OB amount to edit directly</div>
+                </div>
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search" class="search-input" placeholder="Search by name or mobile number...">
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Customer Name</th>
+                            <th>Mobile</th>
+                            <th>Opening Balance</th>
+                            <th>Actions</th>
+                            <th>Settlement</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body">
+                        <!-- Customer rows will be inserted here by JavaScript -->
+                        <tr class="empty-state-row">
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="empty-state-title">No Customers Found</div>
+                                    <div class="empty-state-description">
+                                        Add your first customer using the form above to get started.
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div>
+                Customer OB Management System &copy; 2023 | Designed for Software Companies
+            </div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Documentation</a>
+                <a href="#" class="footer-link">API Reference</a>
+                <a href="#" class="footer-link">Support</a>
+                <a href="#" class="footer-link">Version 2.1.0</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Payment Settlement Modal -->
+    <div id="paymentModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    Settle Opening Balance
+                </div>
+                <button class="modal-close" onclick="closePaymentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="settlement-info">
+                    <div class="info-row">
+                        <span class="info-label">Customer:</span>
+                        <span class="info-value" id="pay_name">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Current OB:</span>
+                        <span class="info-value" id="pay_current_ob">₹0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">New OB after payment:</span>
+                        <span class="info-value new-ob" id="pay_new_ob">₹0</span>
+                    </div>
+                </div>
+                
+                <div class="amount-input-container">
+                    <label class="amount-input-label">
+                        <i class="fas fa-rupee-sign"></i>
+                        Enter Payment Amount
+                    </label>
+                    <input type="number" id="pay_amount" class="amount-input" 
+                           placeholder="0" oninput="calculateNewOB()" autofocus>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePaymentModal()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+                <button class="btn btn-success" onclick="savePayment()">
+                    <i class="fas fa-check-circle"></i>
+                    Save & Print Payment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript - All original functions preserved -->
+    <script>
+        // Initialize with empty array
+        let customers = [];
+        let paymentCustomerId = null;
+        let paymentCurrentOB = 0;
+        let openSettlementRow = null;
+        let openArrowBtn = null;
+        
+        // DOM Elements
+        const nameInput = document.getElementById("name");
+        const mobileInput = document.getElementById("mobile");
+        const obInput = document.getElementById("ob");
+        const nameError = document.getElementById("nameError");
+        const mobileError = document.getElementById("mobileError");
+        const obError = document.getElementById("obError");
+        const searchInput = document.getElementById("search");
+        
+        // Update date time in header
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('en-IN', options);
+        }
+        
+        // Update stats cards
+        function updateStats() {
+            const totalCustomers = customers.length;
+            const totalOB = customers.reduce((sum, c) => sum + Number(c.old_balance || 0), 0);
+            const positiveOB = customers.reduce((sum, c) => {
+                const bal = Number(c.old_balance || 0);
+                return bal > 0 ? sum + bal : sum;
+            }, 0);
+            const negativeOB = customers.reduce((sum, c) => {
+                const bal = Number(c.old_balance || 0);
+                return bal < 0 ? sum + bal : sum;
+            }, 0);
+            
+            // Update DOM elements
+            document.getElementById('totalCustomers').textContent = totalCustomers;
+            document.getElementById('totalOB').textContent = '₹' + totalOB.toLocaleString('en-IN');
+            document.getElementById('statTotalCustomers').textContent = totalCustomers;
+            document.getElementById('statTotalOB').textContent = '₹' + totalOB.toLocaleString('en-IN');
+            document.getElementById('statPositiveOB').textContent = '₹' + positiveOB.toLocaleString('en-IN');
+            document.getElementById('statNegativeOB').textContent = '₹' + Math.abs(negativeOB).toLocaleString('en-IN');
+        }
+        
+        // Clear form function
+        function clearForm() {
+            nameInput.value = '';
+            mobileInput.value = '';
+            obInput.value = '';
+            nameError.style.visibility = 'hidden';
+            mobileError.style.visibility = 'hidden';
+            obError.style.visibility = 'hidden';
+            nameInput.focus();
+        }
+        
+        // Initialize date time and update every minute
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+        
+        // All original functions from the provided code are preserved below
+        // ============ ORIGINAL FUNCTIONS START ============
+        
+        function esc(str){
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+        async function hasSettlements(customerId){
+    try {
+        const res = await fetch(`/payments/by-customer/${customerId}`);
+        const data = await res.json();
+        return Array.isArray(data) && data.length > 0;
+    } catch {
+        return false;
+    }
+}
+        // 🔒 MOBILE: numbers only, max 10 digits (STEP 4)
+        mobileInput.addEventListener("input", () => {
+            // remove non-numeric characters
+            mobileInput.value = mobileInput.value.replace(/\D/g, "");
+            
+            // limit to 10 digits
+            if (mobileInput.value.length > 10) {
+                mobileInput.value = mobileInput.value.slice(0, 10);
+            }
+            
+            // show error if partially filled
+            if (mobileInput.value.length > 0 && mobileInput.value.length < 10) {
+                mobileError.style.visibility = "visible";
+            } else {
+                mobileError.style.visibility = "hidden";
+            }
+        });
+        
+        async function load(){
+            try {
+                const r = await fetch("/customers/all");
+                if (!r.ok) throw new Error("Failed to load customers");
+                let data;
+try {
+    data = await r.json();
+} catch {
+    throw new Error("Invalid JSON from server");
+}
+customers = Array.isArray(data) ? data : [];
+                customers.sort((a, b) => a.id - b.id);
+                render(customers);
+                
+                // ✅ reset settlement UI state
+                openSettlementRow = null;
+                openArrowBtn = null;
+                
+                // Update stats
+                updateStats();
+                
+            } catch (e) {
+                alert("Failed to load customers");
+                console.error(e);
+            }
+        }
+        
+        function render(list){
+            const body = document.getElementById("body");
+            body.innerHTML = "";
+            
+            if (list.length === 0) {
+                body.innerHTML = `
+                    <tr class="empty-state-row">
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="empty-state-title">No Customers Found</div>
+                                <div class="empty-state-description">
+                                    Add your first customer using the form above to get started.
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            list.forEach((c, index) => {
+                const tr = document.createElement("tr");
+                const obClass = Number(c.old_balance) >= 0 ? 'ob-positive' : 'ob-negative';
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td class="customer-name">${esc(c.name)}</td>
+                    <td>${c.mobile || '-'}</td>
+                    <td class="edit ob-amount ${obClass}" 
+                        ondblclick="editField(event, ${c.id}, 'old_balance', ${c.old_balance})">
+                        ₹${Number(c.old_balance).toLocaleString('en-IN')}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn delete-btn" 
+                                    onclick="deleteCustomer(${c.id}, decodeURIComponent('${encodeURIComponent(c.name)}'))">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn settle-btn" 
+                                    onclick="openPaymentModal(${c.id}, decodeURIComponent('${encodeURIComponent(c.name)}'), ${c.old_balance})">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                Settle Now
+                            </button>
+                            <button class="expand-btn" 
+                                    onclick="toggleSettlements(${c.id}, this)">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                body.appendChild(tr);
+                
+                // settlement row (hidden initially)
+                const settleRow = document.createElement("tr");
+                settleRow.style.display = "none";
+                settleRow.innerHTML = `
+                    <td colspan="6" class="settlements-container">
+                        <div id="settlements-${c.id}">
+                            <div class="settlements-header">
+                                <div class="settlements-title">
+                                    <i class="fas fa-history"></i>
+                                    Settlement History
+                                </div>
+                            </div>
+                            <div class="loading-settlements">
+                                <i class="fas fa-spinner fa-spin"></i> Loading settlements...
+                            </div>
+                        </div>
+                    </td>
+                `;
+                body.appendChild(settleRow);
+            });
+    
+        }
+        
+        async function editField(e, id, field, value){
+    if (await hasSettlements(id)) {
+        alert("Cannot edit Opening Balance after settlements exist.");
+        return;
+    }
+            const td = e.target;
+            const oldValue = value;
+            
+            const input = document.createElement("input");
+            input.value = field === "old_balance" ? value : value;
+            input.style.width = "100%";
+            input.className = "form-input";
+            input.style.fontFamily = "'SF Mono', 'Monaco', monospace";
+            input.style.fontWeight = "600";
+            
+            td.innerHTML = "";
+            td.appendChild(input);
+            input.focus();
+            input.select();
+            
+            let committed = false;
+            
+            const commit = async () => {
+                if (committed) return;
+                committed = true;
+                
+                const newValue = input.value.trim();
+                if (newValue === "") {
+                    const obClass = Number(oldValue) >= 0 ? 'ob-positive' : 'ob-negative';
+                    td.innerHTML = `₹${Number(oldValue).toLocaleString('en-IN')}`;
+                    td.className = `edit ob-amount ${obClass}`;
+                    td.setAttribute('ondblclick', `editField(event, ${id}, 'old_balance', ${oldValue})`);
+                    return;
+                }
+                
+                await fetch("/customers/update", {
+                    method: "POST",
+                    headers: { "Content-Type":"application/json" },
+                    body: JSON.stringify({
+                        id,
+                        old_balance: field === "old_balance" ? Number(newValue) : undefined
+                    })
+                });
+                
+                load();
+            };
+            
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    commit();
+                }
+                if (e.key === "Escape") {
+                    const obClass = Number(oldValue) >= 0 ? 'ob-positive' : 'ob-negative';
+                    td.innerHTML = `₹${Number(oldValue).toLocaleString('en-IN')}`;
+                    td.className = `edit ob-amount ${obClass}`;
+                    td.setAttribute('ondblclick', `editField(event, ${id}, 'old_balance', ${oldValue})`);
+                }
+            });
+            
+            input.addEventListener("blur", commit);
+        }
+        function normalizeName(name){
+    return name.replace(/\s+/g, " ").trim().toLowerCase();
+}
+        async function addCustomer(){
+            const nameVal   = nameInput.value.trim();
+            const mobileVal = mobileInput.value.trim();
+            const obVal     = obInput.value;
+            
+            // 🔒 validate name
+            if (!nameVal) {
+                alert("Customer name is required");
+                nameInput.focus();
+                return;
+            }
+            
+            const duplicate = customers.some(c =>
+                normalizeName(c.name) === normalizeName(nameVal)
+            );
+            
+            if (duplicate) {
+                alert("Customer name already exists");
+                nameInput.focus();
+                return;
+            }
+            
+            if (mobileVal && mobileVal.length !== 10) {
+                alert("Mobile number must be exactly 10 digits");
+                mobileInput.focus();
+                return;
+            }
+            
+            if (obVal.trim() === "") {
+                alert("Opening balance is required");
+                obInput.focus();
+                return;
+            }
+            
+            const res = await fetch("/customers/add", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name:        nameVal,
+                    mobile:      mobileVal,
+                    old_balance: Number(obVal)
+                })
+            });
+            
+            if (!res.ok) {
+                let msg = "Cannot add customer";
+                try {
+                    const err = await res.json();
+                    if (err && err.error) msg = err.error;
+                } catch(e){}
+                alert("Error: " + msg);
+                return;
+            }
+            
+            // clear inputs after success
+            clearForm();
+            
+            // reload table
+            load();
+        }
+        
+        // 🔴 LIVE NAME DUPLICATE CHECK (NO LAYOUT SHIFT)
+        nameInput.addEventListener("input", () => {
+            const val = nameInput.value.trim().toLowerCase();
+            
+            if (!val) {
+                nameError.style.visibility = "hidden";
+                return;
+            }
+            
+            const exists = customers.some(c =>
+                c.name && c.name.trim().toLowerCase() === val
+            );
+            
+            nameError.style.visibility = exists ? "visible" : "hidden";
+        });
+        
+        // NAME → MOBILE (Enter key)
+        nameInput.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+            
+            const val = nameInput.value.trim().toLowerCase();
+            
+            if (!val) {
+                alert("Name is required");
+                nameInput.focus();
+                return;
+            }
+            
+            const exists = customers.some(c =>
+                c.name && c.name.trim().toLowerCase() === val
+            );
+            
+            if (exists) {
+                alert("Customer name already exists");
+                nameInput.focus();
+                return;
+            }
+            
+            mobileInput.focus();
+        });
+        
+        searchInput.oninput = e => {
+            const q = e.target.value.toLowerCase();
+            const filtered = customers.filter(c =>
+                c.name.toLowerCase().includes(q) ||
+                (c.mobile || "").includes(q)
+            );
+            render(filtered);
+        };
+        
+        async function deleteCustomer(id, name){
+            const customer = customers.find(c => c.id === id);
+            
+            if (customer && Number(customer.old_balance) !== 0) {
+                alert(
+                    "Cannot delete customer with Opening Balance.\n" +
+                    "Clear the balance first."
+                );
+                return;
+            }
+            
+            if (!confirm(`Delete customer "${name}"?\nThis cannot be undone.`)) return;
+            
+            try {
+                const res = await fetch("/customers/delete", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ customer_id: id })
+                });
+                
+                if (!res.ok) {
+                    const err = await res.text();
+                    alert("Delete failed: " + err);
+                    return;
+                }
+                
+                load();
+            } catch (e) {
+                alert("Network error while deleting customer");
+                console.error(e);
+            }
+        }
+        
+        mobileInput.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+            
+            const val = mobileInput.value.trim();
+            
+            // ✅ empty mobile allowed
+            if (val === "") {
+                mobileError.style.visibility = "hidden";
+                obInput.focus();
+                return;
+            }
+            
+            // ❌ invalid length
+            if (val.length !== 10) {
+                mobileError.style.visibility = "visible";
+                mobileInput.focus();
+                return;
+            }
+            
+            // ✅ valid mobile
+            mobileError.style.visibility = "hidden";
+            obInput.focus();
+        });
+        
+        // OB field keyboard behavior
+        obInput.addEventListener("keydown", (e) => {
+            // ❌ Normal Enter → do nothing (safe)
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                return;
+            }
+            
+            // ✅ Shift + Enter → Add customer
+            if (e.key === "Enter" && e.shiftKey) {
+                e.preventDefault();
+                
+                const nameVal   = nameInput.value.trim();
+                const mobileVal = mobileInput.value.trim();
+                const obVal     = obInput.value.trim();
+                
+                // basic validation (same rules as add button)
+                if (!nameVal) {
+                    alert("Name is required");
+                    nameInput.focus();
+                    return;
+                }
+                
+                if (mobileVal && mobileVal.length !== 10) {
+                    alert("Mobile number must be 10 digits");
+                    mobileInput.focus();
+                    return;
+                }
+                
+                if (obVal === "") {
+                    obError.style.visibility = "visible";
+                    obInput.focus();
+                    return;
+                }
+                
+                obError.style.visibility = "hidden";
+                
+                // 🔒 intentional save only
+                addCustomer();
+            }
+        });
+        
+        function openPaymentModal(id, name, ob){
+            paymentCustomerId = id;
+            paymentCurrentOB = Number(ob);
+            
+            document.getElementById("pay_name").innerText = name;
+            document.getElementById("pay_current_ob").innerText = "₹" + paymentCurrentOB.toLocaleString('en-IN');
+            document.getElementById("pay_amount").value = "";
+            document.getElementById("pay_new_ob").innerText = "₹" + paymentCurrentOB.toLocaleString('en-IN');
+            
+            document.getElementById("paymentModal").style.display = "flex";
+            document.getElementById("pay_amount").focus();
+        }
+        
+        function closePaymentModal(){
+            document.getElementById("paymentModal").style.display = "none";
+        }
+        
+        function calculateNewOB(){
+            const paid = Number(document.getElementById("pay_amount").value) || 0;
+            const newOB = paymentCurrentOB - paid;
+            document.getElementById("pay_new_ob").innerText = "₹" + newOB.toLocaleString('en-IN');
+            const obEl = document.getElementById("pay_new_ob");
+            obEl.style.color = newOB < 0 ? "var(--danger-color)" : "var(--secondary-color)";
+        }
+        
+async function savePayment(){
+    const paid = Number(document.getElementById("pay_amount").value);
+    
+    if (isNaN(paid) || document.getElementById("pay_amount").value.trim() === "") {
+        alert("Enter a valid payment amount");
+        return;
+    }
+
+    const newOB = paymentCurrentOB - paid;
+
+    const payload = {
+        customer_id: paymentCustomerId,
+        customer_name: document.getElementById("pay_name").innerText,
+        old_ob: paymentCurrentOB,
+        paid_amount: paid,
+        new_ob: newOB
+    };
+
+    const res = await fetch("/payments/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+        alert("Payment failed");
+        return;
+    }
+
+    closePaymentModal();
+    load();
+    alert("Payment saved successfully");
+}
+        
+        async function toggleSettlements(customerId, btn) {
+            const row = btn.closest("tr");
+if (!row) return;
+
+const nextRow = row.nextElementSibling;
+if (!nextRow) return;
+            const icon = btn.querySelector("i");
+            
+            // Toggle button icon
+            if (icon.classList.contains("fa-chevron-down")) {
+                icon.classList.remove("fa-chevron-down");
+                icon.classList.add("fa-chevron-up");
+                btn.classList.add("expanded");
+            } else {
+                icon.classList.remove("fa-chevron-up");
+                icon.classList.add("fa-chevron-down");
+                btn.classList.remove("expanded");
+            }
+            
+            // 🔁 close previously open row
+            if (openSettlementRow && openSettlementRow !== nextRow) {
+                openSettlementRow.style.display = "none";
+                if (openArrowBtn) {
+                    const prevIcon = openArrowBtn.querySelector("i");
+                    prevIcon.classList.remove("fa-chevron-up");
+                    prevIcon.classList.add("fa-chevron-down");
+                    openArrowBtn.classList.remove("expanded");
+                }
+            }
+            
+            // 🔽 toggle current row
+            if (nextRow.style.display === "table-row") {
+                nextRow.style.display = "none";
+                openSettlementRow = null;
+                openArrowBtn = null;
+                return;
+            }
+            
+            // 🔼 open row
+            nextRow.style.display = "table-row";
+            openSettlementRow = nextRow;
+            openArrowBtn = btn;
+            
+            // 📡 load settlements
+            const container = document.getElementById(`settlements-${customerId}`);
+            container.innerHTML = `
+                <div class="settlements-header">
+                    <div class="settlements-title">
+                        <i class="fas fa-history"></i>
+                        Settlement History
+                    </div>
+                </div>
+                <div class="loading-settlements">
+                    <i class="fas fa-spinner fa-spin"></i> Loading settlements...
+                </div>
+            `;
+            
+            try {
+                const res = await fetch(`/payments/by-customer/${customerId}`);
+                const data = await res.json();
+                
+                if (!Array.isArray(data) || data.length === 0) {
+                    container.innerHTML = `
+                        <div class="settlements-header">
+                            <div class="settlements-title">
+                                <i class="fas fa-history"></i>
+                                Settlement History
+                            </div>
+                        </div>
+                        <div class="no-settlements">
+                            <i class="fas fa-receipt"></i>
+                            <div>No settlement records found</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = `
+                    <div class="settlements-header">
+                        <div class="settlements-title">
+                            <i class="fas fa-history"></i>
+                            Settlement History (${data.length} records)
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+    <tr>
+        <th>No</th>
+        <th>Bill No</th>
+        <th>Date & Time</th>
+        <th>Old OB</th>
+        <th>Paid Amount</th>
+        <th>New OB</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+                            <tbody>
+                `;
+                
+                data.forEach((r, i) => {
+    const oldObClass = Number(r.old_ob) >= 0 ? 'ob-positive' : 'ob-negative';
+    const newObClass = Number(r.new_ob) >= 0 ? 'ob-positive' : 'ob-negative';
+
+    html += `
+        <tr>
+            <td>${i + 1}</td>
+
+            <td style="font-weight:700">
+                ${r.bill_id ? `Bill #${r.bill_id}` : `<span style="color:var(--gray-500)">Manual</span>`}
+            </td>
+
+            <td>
+                <div style="font-family: monospace; font-weight: 600;">
+                    ${new Date(r.created_at).toLocaleDateString('en-IN')}
+                    <div style="font-size: 0.85rem; color: var(--gray-600);">
+                        ${new Date(r.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                </div>
+            </td>
+
+            <td class="ob-amount ${oldObClass}">
+                ₹${Number(r.old_ob).toLocaleString('en-IN')}
+            </td>
+
+            <td class="ob-amount ob-positive">
+                ₹${Number(r.paid_amount).toLocaleString('en-IN')}
+            </td>
+
+            <td class="ob-amount ${newObClass}">
+                ₹${Number(r.new_ob).toLocaleString('en-IN')}
+            </td>
+
+            <td>
+                <button class="action-btn edit-btn" onclick="openPaymentReceipt(${r.id})">
+                    <i class="fas fa-print"></i>
+                    Print
+                </button>
+            </td>
+        </tr>
+    `;
+});
+                
+                html += "</tbody></table></div>";
+                container.innerHTML = html;
+                
+            } catch (e) {
+                container.innerHTML = `
+                    <div class="settlements-header">
+                        <div class="settlements-title">
+                            <i class="fas fa-history"></i>
+                            Settlement History
+                        </div>
+                    </div>
+                    <div style="color: var(--danger-color); padding: 20px; text-align: center;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>Failed to load settlements</div>
+                    </div>
+                `;
+            }
+        }
+        
+        async function openPaymentReceipt(receiptId){
+            const res = await fetch(`/payments/receipt/${receiptId}`);
+            if (!res.ok) {
+                alert("Failed to load receipt");
+                return;
+            }
+            
+            let r;
+try {
+    r = await res.json();
+} catch {
+    alert("Invalid receipt data");
+    return;
+}
+            
+            // ---------- SAME CONSTANTS AS BILLING ----------
+            const LINE_WIDTH = 36;
+            const LINE = "-".repeat(LINE_WIDTH);
+            
+            function center(text, width){
+                if (text.length >= width) return text;
+                const left = Math.floor((width - text.length) / 2);
+                return " ".repeat(left) + text;
+            }
+            
+            const d = new Date(r.created_at);
+            
+            const dateStr = d.toLocaleDateString("en-IN");
+            const timeStr = d.toLocaleTimeString("en-IN", {
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true
+            });
+            
+            const dt = dateStr + " | " + timeStr;
+            
+            const printable =
+`${center("PAYMENT SETTLEMENT", LINE_WIDTH)}
+${LINE}
+Receipt No: ${r.id}
+Bill No   : ${r.bill_id ? "Bill #" + r.bill_id : "Manual"}
+Date      : ${dt}
+${LINE}
+Customer: ${esc(r.customer_name)}
+${LINE}
+Old OB : ₹${r.old_ob}
+Paid   : ₹${r.paid_amount}
+New OB : ₹${r.new_ob}
+${LINE}
+${center("Thank You!", LINE_WIDTH)}
+`;
+            
+            const w = window.open("", "_blank");
+            
+            if (!w) {
+                alert("Popup blocked!\n\nPlease allow popups and try again.");
+                return;
+            }
+            
+            w.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Settlement Receipt</title>
+<style>
+@page { margin: 0 }
+body { margin: 0 }
+pre {
+    width: 74mm;
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1.25;
+    padding-left: 2mm;
+    margin: 0 auto;
+}
+</style>
+</head>
+<body>
+<pre>${printable}</pre>
+<script>
+setTimeout(() => {
+    window.focus();
+    window.print();
+    setTimeout(() => window.close(), 500);
+}, 300);
+<\/script>
+</body>
+</html>
+`);
+            
+            w.document.close();
+        }
+        
+        // ============ ORIGINAL FUNCTIONS END ============
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            load();
+            
+            // Close modal when clicking outside
+            document.getElementById('paymentModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closePaymentModal();
+                }
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && document.getElementById('paymentModal').style.display === 'flex') {
+                    closePaymentModal();
+                }
+            });
+            
+            // Focus name input on page load
+            nameInput.focus();
+        });
+    </script>
+
+    <!-- Real-time Client -->
+    <script src="realtimeClient.js"></script>
+    <script>
+        // ========== REAL-TIME UPDATES ==========
+        if (window.realtimeClient) {
+            // Reload customers when they're updated
+            realtimeClient.on('customer:added', (data) => {
+                console.log('Customer added, reloading...');
+                load(); // Refresh customer list
+            });
+
+            realtimeClient.on('customer:updated', (data) => {
+                console.log('Customer updated, reloading...');
+                load(); // Refresh customer list
+            });
+
+            realtimeClient.on('customer:deleted', (data) => {
+                console.log('Customer deleted, reloading...');
+                load(); // Refresh customer list
+            });
+
+            realtimeClient.on('payment:received', (data) => {
+                console.log('Payment received, reloading...');
+                load(); // Refresh to show updated balances
+            });
+        }
+    </script>
+</body>
+</html>

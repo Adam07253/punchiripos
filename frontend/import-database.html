@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Import Database - Punchiri Stores</title>
+  <style>
+    /* =========================
+       PROFESSIONAL DESIGN SYSTEM (Matching Billing Theme)
+    ========================= */
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --secondary: #64748b;
+      --success: #10b981;
+      --success-dark: #059669;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --border-light: #f1f5f9;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --text-muted: #94a3b8;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius: 8px;
+      --radius-sm: 6px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 20px;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+    .header {
+      background: white;
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      border-bottom: 3px solid var(--primary);
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      color: var(--text-light);
+      font-size: 14px;
+    }
+
+    /* =========================
+       MAIN CARD
+    ========================= */
+    .main-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    /* =========================
+       WARNING BOX
+    ========================= */
+    .warning-box {
+      background: #fef3c7;
+      border: 1px solid #fbbf24;
+      border-left: 4px solid var(--warning);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .warning-title {
+      font-weight: 600;
+      color: #92400e;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .warning-text {
+      color: #78350f;
+      font-size: 13px;
+      line-height: 1.6;
+      list-style: none;
+    }
+
+    .warning-text li {
+      margin-bottom: 4px;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .warning-text li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--warning);
+      font-weight: bold;
+    }
+
+    /* =========================
+       UPLOAD AREA
+    ========================= */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 40px 24px;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+      background: var(--bg);
+    }
+
+    .upload-area:hover {
+      border-color: var(--primary);
+      background: var(--border-light);
+    }
+
+    .upload-area.dragover {
+      border-color: var(--primary);
+      background: #dbeafe;
+      border-style: solid;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .upload-text {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .upload-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* =========================
+       FILE INFO
+    ========================= */
+    .file-info {
+      display: none;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .file-info.show {
+      display: block;
+    }
+
+    .file-name {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      word-break: break-all;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .file-size {
+      color: var(--text-light);
+      font-size: 13px;
+    }
+
+    /* =========================
+       BUTTONS
+    ========================= */
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--success-dark);
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--border-light);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* =========================
+       PROGRESS BAR
+    ========================= */
+    .progress-container {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .progress-container.show {
+      display: block;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--border-light);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      text-align: center;
+      margin-top: 8px;
+      color: var(--text-light);
+      font-size: 13px;
+    }
+
+    /* =========================
+       RESULT
+    ========================= */
+    .result {
+      display: none;
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result.success {
+      background: #d1fae5;
+      border-color: var(--success);
+    }
+
+    .result.error {
+      background: #fee2e2;
+      border-color: var(--danger);
+    }
+
+    .result-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result.success .result-title {
+      color: #065f46;
+    }
+
+    .result.error .result-title {
+      color: #991b1b;
+    }
+
+    .result-message {
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .stats {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-item {
+      background: white;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+    @media (max-width: 640px) {
+      body {
+        padding: 12px;
+      }
+
+      .header {
+        padding: 12px 16px;
+      }
+
+      .main-card {
+        padding: 16px;
+      }
+
+      .upload-area {
+        padding: 32px 16px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Import Database</h1>
+      <p>Upload your old database file to import data into the current system</p>
+    </div>
+
+    <!-- Main Card -->
+    <div class="main-card">
+      <!-- Warning Box -->
+      <div class="warning-box">
+        <div class="warning-title">
+          ⚠️ Important Information
+        </div>
+        <ul class="warning-text">
+          <li>A backup will be created automatically before import</li>
+          <li>Data will be merged into the current database</li>
+          <li>Your existing data will NOT be replaced</li>
+          <li>Only valid SQLite database files (.db) are accepted</li>
+        </ul>
+      </div>
+
+      <!-- Upload Area -->
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📁</div>
+        <div class="upload-text">Click to select or drag & drop database file</div>
+        <div class="upload-hint">Supported format: .db (SQLite Database)</div>
+      </div>
+
+      <input type="file" id="fileInput" accept=".db" />
+
+      <!-- File Info -->
+      <div class="file-info" id="fileInfo">
+        <div class="file-name" id="fileName"></div>
+        <div class="file-size" id="fileSize"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions" id="actions" style="display: none;">
+        <button class="btn btn-secondary" id="cancelBtn">
+          <span>✕</span>
+          <span>Cancel</span>
+        </button>
+        <button class="btn btn-primary" id="importBtn">
+          <span>✓</span>
+          <span>Import Database</span>
+        </button>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">Importing...</div>
+      </div>
+
+      <!-- Result -->
+      <div class="result" id="result">
+        <div class="result-title" id="resultTitle"></div>
+        <div class="result-message" id="resultMessage"></div>
+        <div class="stats" id="stats"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const actions = document.getElementById('actions');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const importBtn = document.getElementById('importBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const result = document.getElementById('result');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultMessage = document.getElementById('resultMessage');
+    const stats = document.getElementById('stats');
+
+    let selectedFile = null;
+
+    // Click to upload
+    uploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // File selection
+    fileInput.addEventListener('change', (e) => {
+      handleFile(e.target.files[0]);
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      handleFile(e.dataTransfer.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file) return;
+
+      if (!file.name.endsWith('.db')) {
+        alert('Please select a valid SQLite database file (.db)');
+        return;
+      }
+
+      selectedFile = file;
+      fileName.innerHTML = `📄 ${file.name}`;
+      fileSize.textContent = `Size: ${formatFileSize(file.size)}`;
+      fileInfo.classList.add('show');
+      actions.style.display = 'flex';
+      result.classList.remove('show');
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    cancelBtn.addEventListener('click', () => {
+      selectedFile = null;
+      fileInput.value = '';
+      fileInfo.classList.remove('show');
+      actions.style.display = 'none';
+      result.classList.remove('show');
+    });
+
+    importBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      if (!confirm('Are you sure you want to import this database? A backup will be created automatically.')) {
+        return;
+      }
+
+      // Disable buttons
+      importBtn.disabled = true;
+      cancelBtn.disabled = true;
+
+      // Show progress
+      progressContainer.classList.add('show');
+      progressFill.style.width = '30%';
+      progressText.textContent = 'Uploading and validating...';
+
+      try {
+        const formData = new FormData();
+        formData.append('database', selectedFile);
+
+        progressFill.style.width = '60%';
+        progressText.textContent = 'Importing data...';
+
+        const response = await fetch('http://localhost:3000/api/import-database', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        progressFill.style.width = '100%';
+        progressText.textContent = 'Complete!';
+
+        // Hide progress after a moment
+        setTimeout(() => {
+          progressContainer.classList.remove('show');
+        }, 1000);
+
+        // Show result
+        result.classList.add('show');
+
+        if (data.success) {
+          result.classList.remove('error');
+          result.classList.add('success');
+          resultTitle.textContent = '✓ Import Successful!';
+          resultMessage.textContent = data.message;
+
+          // Show stats
+          if (data.stats) {
+            stats.innerHTML = `
+              <div class="stat-item">
+                <div class="stat-value">${data.stats.products || 0}</div>
+                <div class="stat-label">Products</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${data.stats.customers || 0}</div>
+                <div class="stat-label">Customers</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${data.stats.bills || 0}</div>
+                <div class="stat-label">Bills</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${data.stats.billItems || 0}</div>
+                <div class="stat-label">Bill Items</div>
+              </div>
+            `;
+          }
+
+          // Reset form after success
+          setTimeout(() => {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfo.classList.remove('show');
+            actions.style.display = 'none';
+            importBtn.disabled = false;
+            cancelBtn.disabled = false;
+          }, 3000);
+
+        } else {
+          result.classList.remove('success');
+          result.classList.add('error');
+          resultTitle.textContent = '✕ Import Failed';
+          resultMessage.textContent = data.message || 'An error occurred during import';
+          
+          if (data.error) {
+            resultMessage.textContent += `\n\nError: ${data.error}`;
+          }
+
+          stats.innerHTML = '';
+          importBtn.disabled = false;
+          cancelBtn.disabled = false;
+        }
+
+      } catch (error) {
+        console.error('Import error:', error);
+        
+        progressContainer.classList.remove('show');
+        result.classList.add('show');
+        result.classList.remove('success');
+        result.classList.add('error');
+        resultTitle.textContent = '✕ Import Failed';
+        resultMessage.textContent = `Network error: ${error.message}`;
+        stats.innerHTML = '';
+        
+        importBtn.disabled = false;
+        cancelBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

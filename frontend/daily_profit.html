@@ -1,0 +1,1403 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
+  <title>Daily Report — Punchiri Stores (Reference UI)</title>
+  <!-- Meta description for demo/reference context -->
+  <meta name="description" content="Professional daily profit report UI – reference implementation for software companies" />
+  <!-- Use system fonts + fallbacks -->
+  <style>
+    /* ------------------------------------------------------------------
+       REFERENCE UI — PUNCHIRI STORES
+       Enhanced, clean, and developer‑friendly.
+       All JavaScript functionality preserved exactly as provided.
+       ------------------------------------------------------------------ */
+
+    /* ---------- Design System ---------- */
+    :root {
+      /* Core palette – refined for better contrast & accessibility */
+      --primary: #1e4bd2;
+      --primary-light: #3a67e0;
+      --primary-dark: #1539a5;
+      --primary-soft: #eef3ff;
+
+      --accent-sales: #2563eb;
+      --accent-purchase: #7c3aed;
+      --accent-profit: #059669;
+      --accent-warning: #d97706;
+
+      --gray-50: #f9fafc;
+      --gray-100: #f2f4f8;
+      --gray-200: #e9edf2;
+      --gray-300: #dce1e8;
+      --gray-400: #b9c1cc;
+      --gray-500: #8f99a6;
+      --gray-600: #5f6b7a;
+      --gray-700: #3f4a58;
+      --gray-800: #1e2a36;
+      --gray-900: #0d151e;
+
+      --bg-body: var(--gray-50);
+      --bg-card: #ffffff;
+      --border-light: var(--gray-200);
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.02);
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Consolas', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--bg-body);
+      color: var(--gray-800);
+      line-height: 1.5;
+      padding: 32px 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+
+    /* ---------- Header – refined with subtle gradient ---------- */
+    .header {
+      background: linear-gradient(98deg, #0f2a63 0%, #1a3e8c 100%);
+      color: white;
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .header h1 {
+      font-size: 1.7rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .store-name {
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(4px);
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header-right {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    /* ---------- Control Panel – refined spacing & surfaces ---------- */
+    .control-panel {
+      background: white;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      min-height: 80px;
+    }
+
+    .control-left {
+      padding: 16px 28px;
+      border-right: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      flex-wrap: wrap;
+      background: var(--gray-50);
+    }
+
+    .control-right {
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: var(--gray-50);
+    }
+
+    .period-selector {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .period-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .period-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ---------- Form controls & buttons – modern, crisp ---------- */
+    .btn {
+      padding: 8px 18px;
+      border: 1px solid var(--gray-300);
+      background: white;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+      min-height: 38px;
+      white-space: nowrap;
+      color: var(--gray-700);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .btn:hover {
+      background: var(--gray-100);
+      border-color: var(--gray-500);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary-dark);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      border-color: var(--primary-dark);
+    }
+
+    .btn-success {
+      background: var(--accent-profit);
+      color: white;
+      border-color: #047857;
+      min-width: 130px;
+    }
+
+    .btn-success:hover {
+      background: #047857;
+      border-color: #036b4b;
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      min-height: 32px;
+    }
+
+    .btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary-dark);
+    }
+
+    .form-control {
+      padding: 8px 14px;
+      border: 1px solid var(--gray-300);
+      border-radius: 30px;
+      font-size: 0.85rem;
+      transition: all 0.18s;
+      min-width: 140px;
+      background: white;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30, 75, 210, 0.12);
+    }
+
+    /* ---------- Date range & toggle – integrated chips ---------- */
+    .date-range-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      padding: 4px 6px 4px 16px;
+      border-radius: 40px;
+      border: 1px solid var(--gray-300);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .date-input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .date-separator {
+      color: var(--gray-500);
+      font-weight: 500;
+    }
+
+    .report-type-toggle {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: white;
+      padding: 6px 16px;
+      border-radius: 40px;
+      border: 1px solid var(--gray-300);
+    }
+
+    .toggle-labels {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .toggle-label {
+      color: var(--gray-500);
+      transition: color 0.15s;
+    }
+
+    .toggle-label.active {
+      color: var(--primary);
+    }
+
+    /* ---------- Toggle switch – refined ---------- */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--gray-400);
+      transition: 0.2s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.2s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* ---------- Report Header – modern summary card ---------- */
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 0 24px 0;
+      padding: 20px 28px;
+      background: var(--primary-soft);
+      border-radius: 16px;
+      border: 1px solid #d6e2ff;
+    }
+
+    .report-title {
+      font-size: 1.4rem;
+      font-weight: 650;
+      color: var(--primary-dark);
+      letter-spacing: -0.01em;
+    }
+
+    .report-date {
+      font-size: 0.95rem;
+      color: var(--gray-700);
+      font-weight: 500;
+      background: white;
+      padding: 8px 20px;
+      border-radius: 40px;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    /* ---------- Stat cards – elegant glass with hover lift ---------- */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 24px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 20px;
+      padding: 24px 24px;
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+      position: relative;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -10px rgba(0,0,0,0.06), 0 8px 12px -6px rgba(0,0,0,0.02);
+      border-color: var(--gray-300);
+    }
+
+    .stat-card.highlight {
+      background: linear-gradient(145deg, #f6fef9, white);
+      border-left: 5px solid var(--accent-profit);
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      font-family: var(--font-mono);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .stat-value.sales { color: var(--accent-sales); }
+    .stat-value.purchase { color: var(--accent-purchase); }
+    .stat-value.profit { color: var(--accent-profit); }
+
+    .profit-percentage {
+      display: inline-block;
+      background: var(--accent-profit);
+      color: white;
+      font-size: 0.8rem;
+      padding: 5px 16px;
+      border-radius: 40px;
+      font-weight: 600;
+      margin-top: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* ---------- Sections – cards with clean separation ---------- */
+    .section {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 20px;
+      margin-bottom: 32px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+
+    .section-header {
+      background: var(--gray-50);
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 620;
+      color: var(--gray-800);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-content {
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    /* ---------- Tables – crisp, legible, with refined borders ---------- */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid var(--gray-200);
+    }
+
+    .table {
+      width: 100%;
+      min-width: 1000px;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .table th,
+    .table td {
+      border-right: 1px solid var(--gray-200);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 14px 16px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .table th:last-child,
+    .table td:last-child {
+      border-right: none;
+    }
+
+    .table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table thead {
+      background: var(--gray-100);
+    }
+
+    .table th {
+      font-weight: 700;
+      color: var(--gray-800);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--gray-300);
+    }
+
+    .table tbody tr {
+      transition: background 0.1s ease;
+    }
+
+    .table tbody tr:hover {
+      background: var(--gray-50);
+    }
+
+    .table td.right {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .table tfoot tr {
+      background: #e2f3e7;
+      font-weight: 700;
+    }
+
+    .table tfoot td {
+      font-weight: 700;
+      border-bottom: none;
+    }
+
+    .item-name a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px dashed transparent;
+      transition: border-color 0.15s;
+    }
+
+    .item-name a:hover {
+      color: var(--primary-dark);
+      border-bottom-color: var(--primary-light);
+    }
+
+    /* ---------- Chart area – clean and spacious ---------- */
+    #chartControls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chart-btn {
+      border-radius: 30px;
+      padding: 6px 20px;
+    }
+
+    #profitChart {
+  width: 100% !important;
+  height: 420px !important;   /* rectangle height */
+  border-radius: 12px;
+  background: white;
+}
+
+    /* ---------- Empty state – centered, friendly ---------- */
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--gray-500);
+    }
+
+    .empty-state svg {
+      width: 52px;
+      height: 52px;
+      opacity: 0.6;
+      margin-bottom: 16px;
+    }
+
+    /* ---------- Footer – refined, with reference label ---------- */
+    .footer {
+      padding: 20px 32px;
+      border-top: 1px solid var(--gray-200);
+      background: var(--gray-50);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--gray-600);
+    }
+
+    .footer-reference {
+      background: var(--gray-200);
+      padding: 4px 16px;
+      border-radius: 40px;
+      font-weight: 500;
+      color: var(--gray-700);
+      font-size: 0.8rem;
+    }
+
+    /* ---------- Responsive – fine-tuned ---------- */
+    @media (max-width: 1100px) {
+      .control-grid { grid-template-columns: 1fr; }
+      .control-left { border-right: none; border-bottom: 1px solid var(--gray-200); }
+    }
+
+    @media (max-width: 800px) {
+      body { padding: 16px; }
+      .control-left, .control-right { flex-direction: column; align-items: stretch; }
+      .period-selector { flex-direction: column; align-items: flex-start; }
+      .summary-grid { grid-template-columns: repeat(2,1fr); }
+    }
+
+    @media (max-width: 550px) {
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---------- Keep print styles untouched ---------- */
+    @media print { /* kept from original, unchanged */ }
+  </style>
+  <script>
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+</script>
+</head>
+<body>
+  <div class="container">
+    <!-- ========== HEADER ========== -->
+    <div class="header">
+      <div class="header-left">
+        <h1>📊 Daily Profit Report</h1>
+        <div class="store-name">Punchiri Stores</div>
+      </div>
+      <div class="header-right">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 40px;">📁 Inventory & Analytics</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CONTROL PANEL (PRESERVED IDs) ========== -->
+    <div class="control-panel">
+      <div class="control-grid">
+        <!-- LEFT: time period + custom range -->
+        <div class="control-left">
+          <div class="period-selector">
+            <div class="period-label">Time Period</div>
+            <div class="period-buttons">
+              <button class="btn btn-primary active" id="btnToday">Today</button>
+              <button class="btn btn-secondary" id="btnYesterday">Yesterday</button>
+              <button class="btn btn-secondary" id="btnWeek">Week</button>
+              <button class="btn btn-secondary" id="btnMonth">Month</button>
+            </div>
+          </div>
+          <div class="date-range-container">
+            <div class="date-input-group">
+              <input type="date" id="from" class="form-control" placeholder="From">
+              <span class="date-separator">→</span>
+              <input type="date" id="to" class="form-control" placeholder="To">
+            </div>
+            <button class="btn btn-primary btn-sm" id="btnRange">Apply</button>
+          </div>
+        </div>
+
+        <!-- RIGHT: report toggle & export -->
+        <div class="control-right">
+          <div class="report-type-toggle">
+            <div class="toggle-labels">
+              <span class="toggle-label active" id="labelSales">Sales</span>
+              <label class="switch">
+                <input type="checkbox" id="reportToggle" checked>
+                <span class="slider"></span>
+              </label>
+              <span class="toggle-label" id="labelPurchase">Purchase</span>
+            </div>
+          </div>
+          <button class="btn btn-success" id="btnExport">
+            <svg fill="currentColor" viewBox="0 0 20 20" style="width: 16px; height: 16px;">
+              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+            Export PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== MAIN CONTENT (ID: reportArea) ========== -->
+    <div class="content" id="reportArea">
+      <!-- Report header -->
+      <div class="report-header">
+        <div class="report-title">📋 Daily Report Summary</div>
+        <div id="dateRange" class="report-date">Loading...</div>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="summary-grid">
+        <div class="stat-card">
+          <div class="stat-label">🧾 Total Bills</div>
+          <div class="stat-value" id="totalBills">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">💰 Total Sales</div>
+          <div class="stat-value sales" id="totalSales">₹ 0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">📦 Total Purchase</div>
+          <div class="stat-value purchase" id="totalPurchases">₹ 0.00</div>
+        </div>
+        <div class="stat-card highlight">
+          <div class="stat-label">📈 Total Profit</div>
+          <div class="stat-value profit" id="totalProfit">₹ 0.00</div>
+          <div id="profitPercentage" class="profit-percentage" style="display: none;">0.00%</div>
+        </div>
+      </div>
+
+      <!-- SALES SECTION (ID: salesSection) -->
+      <div class="section" id="salesSection">
+        <div class="section-header">
+          <div class="section-title">
+            <svg fill="currentColor" viewBox="0 0 20 20" style="width: 20px; height: 20px;">
+              <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>
+            </svg>
+            Sales Report
+          </div>
+        </div>
+        <div class="section-content">
+          <div class="table-container">
+            <table class="table" id="salesTable">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Item</th>
+                  <th>Remaining Stock</th>
+                  <th>Retail Qty</th>
+                  <th>Wholesale Qty</th>
+                  <th>Total Qty</th>
+                  <th>Total Sales</th>
+                  <th>Profit</th>
+                  <th>Profit %</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot style="display: none;">
+                <tr>
+                  <td colspan="6">Total</td>
+                  <td class="right">₹ 0.00</td>
+                  <td class="right">₹ 0.00</td>
+                  <td class="right">0.00%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PURCHASE SECTION (ID: purchaseSection) -->
+      <div class="section" id="purchaseSection">
+        <div class="section-header">
+          <div class="section-title">
+            <svg fill="currentColor" viewBox="0 0 20 20" style="width: 20px; height: 20px;">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2h6a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+            </svg>
+            Purchase Report
+          </div>
+        </div>
+        <div class="section-content">
+          <div class="table-container">
+            <table class="table" id="purchasesTable">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Item</th>
+                  <th>Remaining Stock</th>
+                  <th>Qty</th>
+                  <th>Per Unit (Prev)</th>
+                  <th>Retail Price</th>
+                  <th>Wholesale Price</th>
+                  <th>Total Cost</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHART SECTION (preserved exact structure) -->
+      <div class="section">
+        <div class="section-header">
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+            <div class="section-title">📈 Trend Chart</div>
+            <div style="display:flex; gap:16px; align-items:center;">
+  
+  <!-- Period Buttons -->
+  <div id="chartPeriodControls" style="display:flex; gap:6px;">
+    <button class="btn btn-primary btn-sm chart-period-btn active" data-period="1M">1M</button>
+    <button class="btn btn-secondary btn-sm chart-period-btn" data-period="1W">1W</button>
+    <button class="btn btn-secondary btn-sm chart-period-btn" data-period="1Y">1Y</button>
+  </div>
+
+  <!-- Dataset Buttons -->
+  <div id="chartControls" style="display:flex; gap:8px;">
+    <button class="btn btn-primary btn-sm chart-btn active" data-type="sales">Sales</button>
+    <button class="btn btn-secondary btn-sm chart-btn" data-type="purchase">Purchase</button>
+    <button class="btn btn-secondary btn-sm chart-btn" data-type="profit">Profit</button>
+  </div>
+
+</div>
+          </div>
+        </div>
+        <div class="section-content">
+          <canvas id="profitChart"></canvas>
+        </div>
+      </div>
+    </div> <!-- /reportArea -->
+
+    <!-- ========== FOOTER ========== -->
+    <div class="footer">
+      <div>Punchiri Stores · Daily Report System · v1.0</div>
+      <div class="footer-reference">🔹 Reference UI for software companies</div>
+    </div>
+  </div> <!-- /container -->
+
+  <!-- ========== DEPENDENCIES (exactly as provided) ========== -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- ========== ORIGINAL SCRIPT – UNCHANGED (preserved verbatim) ========== -->
+  <script>
+  // ════════════════════════════════════════════════════════════════
+  // ⚠️  NO CHANGES MADE – ALL FUNCTIONS, VARIABLES, AND HANDLERS
+  //     ARE EXACTLY AS PROVIDED IN THE ORIGINAL SOURCE.
+  // ════════════════════════════════════════════════════════════════
+
+  const BASE = location.origin;
+  const $ = id => document.getElementById(id);
+  let currentFromDate = null;
+  let currentToDate = null;
+
+  function formatDMY(dateStr) {
+    const [y, m, d] = dateStr.split("-");
+    return `${d}-${m}-${y}`;
+  }
+
+  function getBaseDateName() {
+    if (currentFromDate && currentToDate) {
+      if (currentFromDate === currentToDate) {
+        return formatDMY(currentFromDate);
+      }
+      return `${formatDMY(currentFromDate)} - ${formatDMY(currentToDate)}`;
+    }
+    return 'Report';
+  }
+
+  function getSalesFileName() {
+    return `${getBaseDateName()}_Sales_Report.pdf`;
+  }
+
+  function getPurchaseFileName() {
+    return `${getBaseDateName()}_Purchase_Report.pdf`;
+  }
+
+  const fmt = (n,d=2)=> Number(n||0).toFixed(d);
+
+  function isoDateOffset(n=0){
+    const d = new Date();
+    d.setDate(d.getDate()+n);
+    return d.toISOString().split("T")[0];
+  }
+
+  $('btnToday').onclick = ()=> {
+    setActiveButton('btnToday');
+    const d = isoDateOffset(0);
+    currentFromDate = d;
+    currentToDate = d;
+    selectDate(d);
+  };
+
+  $('btnYesterday').onclick = ()=> {
+    setActiveButton('btnYesterday');
+    const d = isoDateOffset(-1);
+    currentFromDate = d;
+    currentToDate = d;
+    selectDate(d);
+  };
+
+  $('btnWeek').onclick = ()=> {
+    setActiveButton('btnWeek');
+    const to = isoDateOffset(0);
+    const from = isoDateOffset(-7);
+    currentFromDate = from;
+    currentToDate = to;
+    loadRange(from, to);
+  };
+
+  $('btnMonth').onclick = ()=> {
+    setActiveButton('btnMonth');
+    const to = isoDateOffset(0);
+    const from = isoDateOffset(-30);
+    currentFromDate = from;
+    currentToDate = to;
+    loadRange(from, to);
+  };
+
+  $('btnRange').onclick = ()=> {
+    const f = $('from').value;
+    const t = $('to').value;
+    if (!f || !t) {
+      alert("Select both dates");
+      return;
+    }
+    currentFromDate = f;
+    currentToDate = t;
+    loadRange(f, t);
+  };
+
+  window.onload = ()=> {
+
+  const today = isoDateOffset(0);
+    currentFromDate = today;
+    currentToDate = today;
+    $('from').value = today;
+    $('to').value = today;
+    setActiveButton('btnToday');
+    selectDate(today);
+loadChart();
+
+    document.getElementById('reportToggle').addEventListener('change', function() {
+      const labelSales = document.getElementById('labelSales');
+      const labelPurchase = document.getElementById('labelPurchase');
+      if (this.checked) {
+        labelSales.classList.add('active');
+        labelPurchase.classList.remove('active');
+        document.getElementById('salesSection').style.display = 'block';
+        document.getElementById('purchaseSection').style.display = 'none';
+      } else {
+        labelSales.classList.remove('active');
+        labelPurchase.classList.add('active');
+        document.getElementById('salesSection').style.display = 'none';
+        document.getElementById('purchaseSection').style.display = 'block';
+      }
+    });
+  };
+
+  function setActiveButton(activeId) {
+    const buttons = ['btnToday','btnYesterday','btnWeek','btnMonth'];
+    buttons.forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.classList.remove('active');
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-secondary');
+    });
+    const activeBtn = document.getElementById(activeId);
+    if (activeBtn) {
+      activeBtn.classList.remove('btn-secondary');
+      activeBtn.classList.add('btn-primary');
+      activeBtn.classList.add('active');
+    }
+  }
+
+async function selectDate(date) {
+  try {
+
+    const res = await fetch(BASE + '/daily-profit?date=' + encodeURIComponent(date));
+
+    if (!res.ok) throw new Error('Server not ready');
+
+    const data = await res.json();
+
+    render(data, date, 'single');
+    $('dateRange').textContent = `📅 ${formatDateDMY(date)}`;
+
+  } catch (err) {
+
+    console.warn("Retrying fetch...");
+
+    try {
+      await new Promise(r => setTimeout(r, 300));
+
+      const retryRes = await fetch(BASE + '/daily-profit?date=' + encodeURIComponent(date));
+
+      if (!retryRes.ok) return;
+
+      const retryData = await retryRes.json();
+
+      render(retryData, date, 'single');
+      $('dateRange').textContent = `📅 ${formatDateDMY(date)}`;
+
+    } catch (e) {
+      console.error("Final load failed:", e);
+    }
+  }
+}
+  function formatDateDMY(dateStr) {
+    const parts = dateStr.split("-");
+    if (parts.length !== 3) return dateStr;
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+
+  async function loadRange(from, to){
+    try {
+      const res = await fetch(BASE + '/daily-profit-range?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to));
+      if(!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      render(data, from+' — '+to, 'range');
+      $('dateRange').textContent = `📅 ${formatDateDMY(from)} — ${formatDateDMY(to)}`;
+    } catch (err) {
+      alert('Failed to load range: ' + err.message);
+    }
+  }
+
+  function render(data, label, mode){
+    const sum = data.summary || {};
+    const items = data.items || [];
+    const purchases = data.purchases || [];
+
+    $('totalBills').textContent = sum.total_bills || 0;
+    $('totalSales').textContent = `₹ ${fmt(sum.total_sales || 0)}`;
+
+    const totalPurchases =
+      (typeof sum.total_purchase_cost !== 'undefined')
+        ? Number(sum.total_purchase_cost || 0)
+        : (data.purchases
+            ? data.purchases.reduce((s, p) => s + Number(p.total_cost || 0), 0)
+            : 0);
+
+    $('totalPurchases').textContent = `₹ ${fmt(totalPurchases || 0)}`;
+    $('totalProfit').textContent = `₹ ${fmt(sum.total_profit || 0)}`;
+
+    const totalSales = Number(sum.total_sales || 0);
+    const totalProfit = Number(sum.total_profit || 0);
+    const profitPercentage = totalSales > 0 ? ((totalProfit / totalSales) * 100) : 0;
+
+    const profitPercentageElement = $('profitPercentage');
+    profitPercentageElement.textContent = `${profitPercentage.toFixed(2)}%`;
+    profitPercentageElement.style.display = 'inline-block';
+
+    function formatQtyDisplay(qty) {
+      qty = Number(qty);
+      if (isNaN(qty)) return qty;
+      if (qty > 0 && qty < 1) {
+        return Math.round(qty * 1000) + "g";
+      }
+      return qty.toFixed(3).replace(/\.?0+$/, '');
+    }
+
+    function getStockWarningColor(qty) {
+      const num = Number(qty);
+      if (isNaN(num)) return "";
+      if (num < 25) return "#fee2e2";
+      return "";
+    }
+
+    function formatPerUnitWithPrev(current, previous) {
+      const curr = Number(current || 0);
+      const prev = Number(previous || 0);
+      if (!prev) {
+        return `<div>₹${fmt(curr)}</div>`;
+      }
+      const color = curr <= prev ? "#059669" : "#dc2626";
+      return `
+        <div>₹${fmt(curr)}</div>
+        <div style="color:${color}; font-size:12px;">
+          (prev ₹${fmt(prev)})
+        </div>
+      `;
+    }
+
+    const salesWrap = document.querySelector('#salesTable tbody');
+    const salesFoot = document.querySelector('#salesTable tfoot');
+    salesWrap.innerHTML = "";
+
+    let sumSales = 0;
+    let sumProfit = 0;
+
+    if (!items || items.length === 0) {
+      salesWrap.innerHTML = `
+        <tr>
+          <td colspan="9" class="empty-state">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>
+            </svg>
+            <div>No sales data available for this period</div>
+          </td>
+        </tr>
+      `;
+      salesFoot.style.display = 'none';
+    } else {
+      items.forEach((it, i) => {
+        const sales = Number(it.total_sales || 0);
+        const profit = Number(it.profit || 0);
+        const profitPct = sales > 0 ? ((profit / sales) * 100).toFixed(2) : "0.00";
+        sumSales += sales;
+        sumProfit += profit;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td class="item-name">
+            ${
+              (currentFromDate === currentToDate && 
+               currentFromDate === isoDateOffset(0))
+                ? `<a href="/purchase-history.html?product_id=${it.product_id}&from=daily-profit">
+                     ${it.name}
+                   </a>`
+                : it.name
+            }
+          </td>
+          <td class="right" style="background:${getStockWarningColor(it.remaining_stock)}">
+            ${formatQtyDisplay(it.remaining_stock ?? 0)}
+          </td>
+          <td class="right">${formatQtyDisplay(it.retail_qty)}</td>
+          <td class="right">${formatQtyDisplay(it.wholesale_qty)}</td>
+          <td class="right">${formatQtyDisplay(it.total_qty)}</td>
+          <td class="right">₹${fmt(sales)}</td>
+          <td class="right">₹${fmt(profit)}</td>
+          <td class="right">${profitPct}%</td>
+        `;
+        salesWrap.appendChild(tr);
+      });
+      const totalProfitPct = sumSales > 0 ? ((sumProfit / sumSales) * 100).toFixed(2) : "0.00";
+      salesFoot.innerHTML = `
+        <tr>
+          <td colspan="6" style="font-weight: 700;">Total</td>
+          <td class="right" style="font-weight: 700;">₹${fmt(sumSales)}</td>
+          <td class="right" style="font-weight: 700;">₹${fmt(sumProfit)}</td>
+          <td class="right" style="font-weight: 700;">${totalProfitPct}%</td>
+        </tr>
+      `;
+      salesFoot.style.display = '';
+    }
+
+    const pb = document.querySelector("#purchasesTable tbody");
+    pb.innerHTML = "";
+    let sumPurchaseCost = 0;
+
+    if (!purchases || purchases.length === 0) {
+      pb.innerHTML = `
+        <tr>
+          <td colspan="8" class="empty-state">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2h6a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+            </svg>
+            <div>No purchases recorded for this period</div>
+          </td>
+        </tr>
+      `;
+    } else {
+      purchases.forEach((p, i) => {
+        const totalCost = Number(p.total_cost || 0);
+        sumPurchaseCost += totalCost;
+        const tr = document.createElement('tr');
+        const currentRetail = Number(p.current_retail_price || 0);
+        const currentWholesale = Number(p.current_wholesale_price || 0);
+        const perUnit = Number(p.per_unit_cost || 0);
+        const retailColor = currentRetail > perUnit ? "#059669" : "#dc2626";
+        const wholesaleColor = currentWholesale > perUnit ? "#059669" : "#dc2626";
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td class="item-name">
+            <a href="/purchase-history.html?product_id=${p.product_id}&from=daily-profit">
+              ${p.name}
+            </a>
+          </td>
+          <td class="right" style="background:${getStockWarningColor(p.remaining_stock)}">
+            ${formatQtyDisplay(p.remaining_stock ?? 0)}
+          </td>
+          <td class="right">${formatQtyDisplay(p.qty)}</td>
+          <td class="right">
+            ${formatPerUnitWithPrev(perUnit, p.previous_per_unit_price)}
+          </td>
+          <td class="right" style="color:${retailColor}">
+            ₹${fmt(currentRetail)}
+          </td>
+          <td class="right" style="color:${wholesaleColor}">
+            ₹${fmt(currentWholesale)}
+          </td>
+          <td class="right">₹${fmt(p.total_cost)}</td>
+        `;
+        pb.appendChild(tr);
+      });
+      const pTotalRow = document.createElement("tr");
+      pTotalRow.style.fontWeight = "700";
+      pTotalRow.style.background = "#f1f8f4";
+      pTotalRow.innerHTML = `
+        <td colspan="7">Total Purchase</td>
+        <td class="right">₹${fmt(sumPurchaseCost)}</td>
+      `;
+      pb.appendChild(pTotalRow);
+    }
+  }
+
+  $('btnExport').onclick = async () => {
+    try {
+      const { jsPDF } = window.jspdf;
+      const report = document.getElementById('reportArea');
+      const sales = document.getElementById('salesSection');
+      const purchase = document.getElementById('purchaseSection');
+      const toggle = document.getElementById('reportToggle');
+      if (!report || !sales || !purchase) {
+        alert("Report sections not found");
+        return;
+      }
+      const wasSalesVisible = toggle.checked;
+
+      sales.style.display = 'block';
+      purchase.style.display = 'none';
+      toggle.checked = true;
+      document.getElementById('labelSales').classList.add('active');
+      document.getElementById('labelPurchase').classList.remove('active');
+      await new Promise(r => setTimeout(r, 200));
+      let canvas = await html2canvas(report, { scale: 2, useCORS: true });
+      let pdf = new jsPDF('p', 'pt', 'a4');
+      let imgData = canvas.toDataURL('image/jpeg', 0.95);
+      let pageWidth = pdf.internal.pageSize.getWidth();
+      let imgWidth = pageWidth - 40;
+      let imgHeight = canvas.height * imgWidth / canvas.width;
+      pdf.addImage(imgData, 'JPEG', 20, 20, imgWidth, imgHeight);
+      pdf.save(getSalesFileName());
+
+      sales.style.display = 'none';
+      purchase.style.display = 'block';
+      toggle.checked = false;
+      document.getElementById('labelSales').classList.remove('active');
+      document.getElementById('labelPurchase').classList.add('active');
+      await new Promise(r => setTimeout(r, 200));
+      canvas = await html2canvas(report, { scale: 2, useCORS: true });
+      pdf = new jsPDF('p', 'pt', 'a4');
+      imgData = canvas.toDataURL('image/jpeg', 0.95);
+      imgHeight = canvas.height * imgWidth / canvas.width;
+      pdf.addImage(imgData, 'JPEG', 20, 20, imgWidth, imgHeight);
+      pdf.save(getPurchaseFileName());
+
+      if (wasSalesVisible) {
+        sales.style.display = 'block';
+        purchase.style.display = 'none';
+        toggle.checked = true;
+        document.getElementById('labelSales').classList.add('active');
+        document.getElementById('labelPurchase').classList.remove('active');
+      } else {
+        sales.style.display = 'none';
+        purchase.style.display = 'block';
+        toggle.checked = false;
+        document.getElementById('labelSales').classList.remove('active');
+        document.getElementById('labelPurchase').classList.add('active');
+      }
+    } catch (err) {
+      alert('Export failed: ' + err.message);
+    }
+  };
+
+  let profitChartInstance = null;
+  let activeDatasets = { sales: true, purchase: false, profit: false };
+  let chartPeriod = '1M'; // default
+
+  document.querySelectorAll('.chart-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const type = this.dataset.type;
+      activeDatasets[type] = !activeDatasets[type];
+      if (!activeDatasets.sales && !activeDatasets.purchase && !activeDatasets.profit) {
+        activeDatasets[type] = true;
+        return;
+      }
+      document.querySelectorAll('.chart-btn').forEach(b => {
+        const t = b.dataset.type;
+        if (activeDatasets[t]) {
+          b.classList.remove('btn-secondary');
+          b.classList.add('btn-primary', 'active');
+        } else {
+          b.classList.remove('btn-primary', 'active');
+          b.classList.add('btn-secondary');
+        }
+      });
+      loadChart();
+    });
+  });
+document.querySelectorAll('.chart-period-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+
+    chartPeriod = this.dataset.period;
+
+    document.querySelectorAll('.chart-period-btn').forEach(b => {
+      b.classList.remove('btn-primary','active');
+      b.classList.add('btn-secondary');
+    });
+
+    this.classList.remove('btn-secondary');
+    this.classList.add('btn-primary','active');
+
+    loadChart();
+  });
+});
+  async function loadChart() {
+  try {
+
+    const today = isoDateOffset(0);
+
+    let from;
+    let to = today;
+
+    if (chartPeriod === '1W') {
+      from = isoDateOffset(-7);
+    } 
+    else if (chartPeriod === '1M') {
+      from = isoDateOffset(-30);
+    } 
+    else if (chartPeriod === '1Y') {
+      from = isoDateOffset(-365);
+    }
+
+    const res = await fetch(
+      BASE + `/daily-profit-chart?from=${from}&to=${to}`
+    );
+    if (!res.ok) return;
+
+      const data = await res.json();
+      const labels = data.map(d => d.date);
+      const salesData = data.map(d => d.total_sales);
+      const purchaseData = data.map(d => d.total_purchase || 0);
+      const profitData = data.map(d => d.profit);
+      const datasets = [];
+      if (activeDatasets.sales) {
+        datasets.push({
+          label: 'Sales',
+          data: salesData,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37,99,235,0.08)',
+          tension: 0.3,
+          fill: false
+        });
+      }
+      if (activeDatasets.purchase) {
+        datasets.push({
+          label: 'Purchase',
+          data: purchaseData,
+          borderColor: '#7c3aed',
+          backgroundColor: 'rgba(124,58,237,0.08)',
+          tension: 0.3,
+          fill: false
+        });
+      }
+      if (activeDatasets.profit) {
+        datasets.push({
+          label: 'Profit',
+          data: profitData,
+          borderColor: '#059669',
+          backgroundColor: 'rgba(5,150,105,0.08)',
+          tension: 0.3,
+          fill: false
+        });
+      }
+      const ctx = document.getElementById('profitChart').getContext('2d');
+      if (profitChartInstance) {
+        profitChartInstance.destroy();
+      }
+      profitChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+  responsive: true,
+  maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.dataset.label + ': ₹' + Number(context.raw).toLocaleString();
+                }
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
+            y: {
+              position: 'right',
+              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: { callback: function(value) { return '₹' + Number(value).toLocaleString(); } }
+            }
+          }
+        }
+      });
+    } catch (err) {
+      console.error("Chart load error:", err);
+    }
+  }
+  window.addEventListener("pageshow", function () {
+  window.scrollTo(0, 0);
+});
+  </script>
+</body>
+</html>

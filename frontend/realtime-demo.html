@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real-Time Sync Demo - Punchiri Store</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f5f5f5;
+  }
+  .header {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .status {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  .status.connected {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  .status.disconnected {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .card h2 {
+    margin-top: 0;
+    color: #1e293b;
+    font-size: 18px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+  }
+  .event-log {
+    max-height: 400px;
+    overflow-y: auto;
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+  }
+  .event {
+    padding: 8px;
+    margin: 4px 0;
+    border-radius: 4px;
+    border-left: 4px solid #3b82f6;
+    background: white;
+  }
+  .event.product { border-left-color: #10b981; }
+  .event.stock { border-left-color: #f59e0b; }
+  .event.bill { border-left-color: #8b5cf6; }
+  .event.customer { border-left-color: #ec4899; }
+  .event.payment { border-left-color: #06b6d4; }
+  .event-type {
+    font-weight: bold;
+    color: #1e293b;
+  }
+  .event-time {
+    color: #64748b;
+    font-size: 11px;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+  }
+  .stat {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 6px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #2563eb;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+  .instructions {
+    background: #dbeafe;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 15px;
+  }
+  .instructions h3 {
+    margin-top: 0;
+    color: #1e40af;
+  }
+  .instructions ol {
+    margin: 10px 0;
+    padding-left: 20px;
+  }
+  .instructions li {
+    margin: 5px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🔄 Real-Time Synchronization Demo</h1>
+  <p>WebSocket Status: <span class="status disconnected" id="status">Connecting...</span></p>
+  <p style="color: #64748b; margin-top: 10px;">
+    This page demonstrates real-time updates. Open multiple tabs and watch changes sync instantly!
+  </p>
+</div>
+
+<div class="grid">
+  <!-- Event Log -->
+  <div class="card">
+    <h2>📡 Live Event Stream</h2>
+    <div class="event-log" id="eventLog">
+      <div style="color: #64748b; text-align: center; padding: 20px;">
+        Waiting for events...
+      </div>
+    </div>
+    <button onclick="clearLog()" style="margin-top: 10px; padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Clear Log
+    </button>
+  </div>
+
+  <!-- Statistics -->
+  <div class="card">
+    <h2>📊 Event Statistics</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value" id="productCount">0</div>
+        <div class="stat-label">Products</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stockCount">0</div>
+        <div class="stat-label">Stock Updates</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="billCount">0</div>
+        <div class="stat-label">Bills</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="customerCount">0</div>
+        <div class="stat-label">Customers</div>
+      </div>
+    </div>
+    
+    <div class="instructions">
+      <h3>🧪 Test Real-Time Sync</h3>
+      <ol>
+        <li>Open this page in 2+ browser tabs</li>
+        <li>Go to <a href="products.html" target="_blank">Products</a> page</li>
+        <li>Add a product or update stock</li>
+        <li>Watch events appear here instantly!</li>
+        <li>Try creating bills, adding customers</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<script src="realtimeClient.js"></script>
+<script>
+const eventLog = document.getElementById('eventLog');
+const statusEl = document.getElementById('status');
+
+let stats = {
+  products: 0,
+  stock: 0,
+  bills: 0,
+  customers: 0
+};
+
+// Connection status
+realtimeClient.on('connected', () => {
+  statusEl.textContent = 'Connected';
+  statusEl.className = 'status connected';
+  addEvent('system', 'Connected to real-time server', {});
+});
+
+realtimeClient.on('disconnected', () => {
+  statusEl.textContent = 'Disconnected';
+  statusEl.className = 'status disconnected';
+  addEvent('system', 'Disconnected from server', {});
+});
+
+// Product events
+realtimeClient.on('product:added', (product) => {
+  stats.products++;
+  updateStats();
+  addEvent('product', 'Product Added', {
+    name: product.name,
+    stock: product.stock_qty,
+    price: `₹${product.retail_price}`
+  });
+});
+
+realtimeClient.on('product:updated', (product) => {
+  addEvent('product', 'Product Updated', {
+    name: product.name,
+    id: product.id
+  });
+});
+
+realtimeClient.on('price:updated', (product) => {
+  addEvent('product', 'Price Updated', {
+    name: product.name,
+    retail: `₹${product.retail_price}`,
+    wholesale: `₹${product.wholesale_price}`
+  });
+});
+
+realtimeClient.on('product:toggled', (data) => {
+  addEvent('product', 'Product Status Changed', {
+    id: data.id,
+    active: data.active ? 'Active' : 'Inactive'
+  });
+});
+
+// Stock events
+realtimeClient.on('stock:added', (data) => {
+  stats.stock++;
+  updateStats();
+  addEvent('stock', 'Stock Added', {
+    product: data.product.name,
+    added: data.added_qty,
+    new_stock: data.new_stock
+  });
+});
+
+// Bill events
+realtimeClient.on('bill:created', (bill) => {
+  stats.bills++;
+  updateStats();
+  addEvent('bill', 'Bill Created', {
+    bill_id: bill.id,
+    amount: `₹${bill.final_amount}`,
+    items: bill.items ? bill.items.length : 0
+  });
+});
+
+realtimeClient.on('bill:updated', (bill) => {
+  addEvent('bill', 'Bill Updated', {
+    bill_id: bill.id,
+    amount: `₹${bill.final_amount}`
+  });
+});
+
+// Customer events
+realtimeClient.on('customer:added', (customer) => {
+  stats.customers++;
+  updateStats();
+  addEvent('customer', 'Customer Added', {
+    name: customer.name,
+    mobile: customer.mobile || 'N/A'
+  });
+});
+
+realtimeClient.on('customer:updated', (customer) => {
+  addEvent('customer', 'Customer Updated', {
+    name: customer.name,
+    balance: `₹${customer.old_balance}`
+  });
+});
+
+realtimeClient.on('customer:deleted', (data) => {
+  addEvent('customer', 'Customer Deleted', {
+    id: data.id
+  });
+});
+
+// Payment events
+realtimeClient.on('payment:added', (payment) => {
+  addEvent('payment', 'Payment Received', {
+    customer: payment.customer_name,
+    amount: `₹${payment.paid_amount}`
+  });
+});
+
+// Helper functions
+function addEvent(type, title, data) {
+  const event = document.createElement('div');
+  event.className = `event ${type}`;
+  
+  const time = new Date().toLocaleTimeString();
+  
+  let dataHtml = '';
+  for (let key in data) {
+    dataHtml += `<div>${key}: ${data[key]}</div>`;
+  }
+  
+  event.innerHTML = `
+    <div class="event-type">${title}</div>
+    <div class="event-time">${time}</div>
+    ${dataHtml}
+  `;
+  
+  // Clear "waiting" message if present
+  if (eventLog.querySelector('[style*="text-align: center"]')) {
+    eventLog.innerHTML = '';
+  }
+  
+  eventLog.insertBefore(event, eventLog.firstChild);
+  
+  // Keep only last 50 events
+  while (eventLog.children.length > 50) {
+    eventLog.removeChild(eventLog.lastChild);
+  }
+}
+
+function updateStats() {
+  document.getElementById('productCount').textContent = stats.products;
+  document.getElementById('stockCount').textContent = stats.stock;
+  document.getElementById('billCount').textContent = stats.bills;
+  document.getElementById('customerCount').textContent = stats.customers;
+}
+
+function clearLog() {
+  eventLog.innerHTML = '<div style="color: #64748b; text-align: center; padding: 20px;">Log cleared. Waiting for events...</div>';
+  stats = { products: 0, stock: 0, bills: 0, customers: 0 };
+  updateStats();
+}
+</script>
+
+</body>
+</html>

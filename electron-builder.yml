@@ -1,0 +1,30 @@
+appId: com.punchiri.billingsystem
+productName: Punchiri Billing System
+asar: false
+directories:
+  output: dist
+files:
+  - main.js
+  - server.js
+  - database.js
+  - database-import.js
+  - realtime-sync.js
+  - backup-manager.js
+  - frontend/**/*
+  - node_modules/**/*
+  - package.json
+  - .env
+  - settings.json
+  - "!backups/**/*"
+  - "!dist/**/*"
+  - "!.kiro/**/*"
+  - "!.vscode/**/*"
+  - "!shop.db"
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  verifyUpdateCodeSignature: false
+portable:
+  artifactName: "${productName} Setup.${ext}"

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Management · Reference UI (Compact Sidebar)</title>
+  <!-- Font Awesome 6 (free) for clean icons – no functional impact -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background: #f0f4f9;
+      color: #1e293b;
+    }
+
+    /* ---------- SIDEBAR (left) – narrower width ---------- */
+    .sidebar {
+      width: 200px;                /* reduced from 280px */
+      background: linear-gradient(180deg, #0b1423 0%, #121e30 100%);
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 0 20px 0;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .sidebar h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      margin-bottom: 32px;
+      font-size: 1.2rem;            /* slightly smaller */
+      font-weight: 600;
+      color: white;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .sidebar h2 i {
+      color: #3b82f6;
+      font-size: 1.5rem;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;           /* reduced padding */
+      margin: 4px 8px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      font-size: 0.9rem;            /* slightly smaller text */
+      color: #cbd5e1;
+    }
+
+    .menu-item i {
+      width: 20px;
+      font-size: 1.1rem;
+      color: #5f7b9c;
+      transition: color 0.2s;
+    }
+
+    .menu-item:hover {
+      background: #1e2b41;
+      color: white;
+      transform: translateX(4px);
+    }
+
+    .menu-item:hover i {
+      color: #3b82f6;
+    }
+
+    /* active menu item (optional) */
+    .menu-item.active {
+      background: #2563eb;
+      color: white;
+    }
+    .menu-item.active i {
+      color: white;
+    }
+
+    /* ---------- MAIN (right side) – takes remaining space ---------- */
+   .main {
+  flex: 1;
+  display: flex;
+  background: #f0f4f9;
+}
+
+    /* top bar with glass effect */
+    .topbar {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 14px 28px;           /* slightly reduced */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.6);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+    }
+
+    .topbar h1 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #0f2b4b;
+    }
+
+    .topbar h1 i {
+      background: #e0e7ff;
+      padding: 6px;
+      border-radius: 10px;
+      color: #2563eb;
+    }
+
+    #dateTime {
+      background: white;
+      padding: 6px 20px;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    /* content area – iframe with more space */
+.content {
+  flex: 1;
+  padding: 10px;
+  overflow: hidden;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+}
+
+    /* small reference badge (non‑functional) */
+    .reference-badge {
+      position: fixed;
+      bottom: 16px;
+      right: 24px;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(8px);
+      padding: 6px 18px;
+      border-radius: 60px;
+      font-size: 0.75rem;
+      color: #3f5575;
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      z-index: 999;
+      pointer-events: none;
+    }
+
+    .reference-badge i {
+      color: #2563eb;
+      margin-right: 6px;
+    }
+
+    /* responsive: on small screens, sidebar collapses further */
+    @media (max-width: 700px) {
+      .sidebar {
+        width: 70px;
+      }
+      .sidebar h2 span, .menu-item span {
+        display: none;
+      }
+      .sidebar h2 {
+        justify-content: center;
+        padding: 0;
+      }
+      .menu-item {
+        justify-content: center;
+        padding: 12px 0;
+      }
+    }
+    #refreshBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+#refreshBtn:hover {
+  background: #1e40af;
+  transform: rotate(90deg);
+}
+  </style>
+</head>
+<body>
+
+  <!-- LEFT SIDEBAR (narrower) with all menu items -->
+  <div class="sidebar">
+    <h2>
+      <i class="fas fa-store"></i>
+      <span>SHOP</span>            <!-- shorter text to fit -->
+    </h2>
+
+    <div class="menu-item" onclick="openPage('billing_v2.html')">
+      <i class="fas fa-cash-register"></i>
+      <span>Billing</span>
+    </div>
+    <div class="menu-item" onclick="openPage('view-bills.html')">
+      <i class="fas fa-file-invoice"></i>
+      <span>View Bills</span>
+    </div>
+    <div class="menu-item" onclick="openPage('add_stock.html')">
+      <i class="fas fa-boxes"></i>
+      <span>Add Stock</span>
+    </div>
+    <div class="menu-item" onclick="openPage('products.html')">
+      <i class="fas fa-cubes"></i>
+      <span>Products</span>
+    </div>
+    <div class="menu-item" onclick="openPage('daily_profit.html')">
+      <i class="fas fa-chart-line"></i>
+      <span>Daily Profit</span>
+    </div>
+    <div class="menu-item" onclick="openPage('customers.html')">
+      <i class="fas fa-users"></i>
+      <span>Customers</span>
+    </div>
+    <div class="menu-item" onclick="openPage('add_product.html')">
+      <i class="fas fa-plus-circle"></i>
+      <span>Add Product</span>
+    </div>
+    
+    <div class="menu-item" onclick="openPage('import-database.html')">
+      <i class="fas fa-file-import"></i>
+      <span>Import DB</span>
+    </div>
+    
+    <!-- Close Store Button -->
+    <div class="menu-item" onclick="closeStore()" style="margin-top: auto; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); border-top: 1px solid rgba(255,255,255,0.1);">
+      <i class="fas fa-power-off"></i>
+      <span>Close Store</span>
+    </div>
+  </div>
+
+  <!-- RIGHT MAIN AREA (now larger) -->
+  <div class="main">
+
+    <div class="content">
+
+  <iframe id="billingFrame"
+          src="http://localhost:3000/billing_v2.html"
+          title="Billing"></iframe>
+
+  <iframe id="viewBillsFrame"
+          src="http://localhost:3000/view-bills.html"
+          style="display:none;"
+          title="View Bills"></iframe>
+
+  <iframe id="stockFrame"
+          src="http://localhost:3000/add_stock.html"
+          style="display:none;"
+          title="Add Stock"></iframe>
+
+  <iframe id="productsFrame"
+          src="http://localhost:3000/products.html"
+          style="display:none;"
+          title="Products"></iframe>
+
+  <iframe id="profitFrame"
+          src="http://localhost:3000/daily_profit.html"
+          style="display:none;"
+          title="Daily Profit"></iframe>
+
+  <iframe id="customersFrame"
+          src="http://localhost:3000/customers.html"
+          style="display:none;"
+          title="Customers"></iframe>
+
+  <iframe id="addProductFrame"
+          src="http://localhost:3000/add_product.html"
+          style="display:none;"
+          title="Add Product"></iframe>
+
+  <iframe id="importDbFrame"
+          src="http://localhost:3000/import-database.html"
+          style="display:none;"
+          title="Import Database"></iframe>
+
+</div>
+  </div>
+
+  <!-- subtle reference badge (no functional impact) -->
+  <div class="reference-badge">
+    <i class="fas fa-code-branch"></i> reference UI · functions preserved
+  </div>
+<button id="refreshBtn" onclick="refreshCurrentPage()">
+  <i class="fas fa-rotate-right"></i>
+</button>
+  <script>
+
+    let currentFrame = "billingFrame";
+    const pageOrder = [
+  'billing_v2.html',
+  'view-bills.html',
+  'add_stock.html',
+  'products.html',
+  'daily_profit.html',
+  'customers.html',
+  'add_product.html'
+];
+
+let currentIndex = 0;
+
+window.addEventListener("DOMContentLoaded", () => {
+  openPage(pageOrder[currentIndex]);
+});
+function openPage(page) {
+
+  const frameMap = {
+    'billing_v2.html': 'billingFrame',
+    'view-bills.html': 'viewBillsFrame',
+    'add_stock.html': 'stockFrame',
+    'products.html': 'productsFrame',
+    'daily_profit.html': 'profitFrame',
+    'customers.html': 'customersFrame',
+    'add_product.html': 'addProductFrame',
+    'import-database.html': 'importDbFrame'
+  };
+
+  // Hide all frames
+ Object.values(frameMap).forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.style.display = "none";
+});
+
+  // Show selected frame
+  const selected = frameMap[page];
+  if (selected) {
+  const frameEl = document.getElementById(selected);
+if (frameEl) frameEl.style.display = "block";
+  if (page === "billing_v2.html") {
+const billingFrame = document.getElementById("billingFrame");
+if (billingFrame && billingFrame.contentWindow) {
+  billingFrame.contentWindow.postMessage(
+    { type: "CHECK_SAFE_REFRESH" },
+    "*"
+  );
+}
+}
+  currentFrame = selected; 
+  currentIndex = pageOrder.indexOf(page);  // 🔥 track active page
+}
+}
+
+    // Optional: highlight active menu item (purely visual)
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+      item.addEventListener('click', function() {
+        menuItems.forEach(mi => mi.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+function refreshCurrentPage() {
+  const frame = document.getElementById(currentFrame);
+
+  if (frame) {
+    const currentSrc = frame.src;   // get current URL
+    frame.src = "";                 // clear it first
+    frame.src = currentSrc;         // reload it
+  }
+}
+
+// Close Store - Trigger Cloudflare R2 Backup
+async function closeStore() {
+  if (!confirm('Are you sure you want to close the store? This will create a backup and upload it to Cloudflare.')) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('http://localhost:3000/api/store-closing-backup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert('✓ Backup uploaded successfully\n\nFilename: ' + result.filename + '\nLocation: ' + result.r2Key);
+      
+      // After successful backup, show logout popup
+      if (confirm('Do you want to logout?')) {
+        sessionStorage.removeItem('adminLoggedIn');
+        sessionStorage.removeItem('adminUsername');
+        window.location.href = '/login.html';
+      }
+    } else {
+      alert('✗ Backup failed\n\nError: ' + (result.error || result.message));
+    }
+  } catch (error) {
+    console.error('Store closing backup error:', error);
+    alert('✗ Backup failed\n\nError: ' + error.message);
+  }
+}
+  </script>
+
+  <!-- Real-time Client -->
+  <script src="realtimeClient.js"></script>
+  <script>
+    // ========== REAL-TIME UPDATES ==========
+    if (window.realtimeClient) {
+      // Reload dashboard when data changes
+      realtimeClient.on('bill:created', (data) => {
+        console.log('Bill created, reloading dashboard...');
+        loadDashboard(); // Refresh dashboard stats
+      });
+
+      realtimeClient.on('product:added', (data) => {
+        console.log('Product added, reloading dashboard...');
+        loadDashboard(); // Refresh dashboard stats
+      });
+
+      realtimeClient.on('stock:added', (data) => {
+        console.log('Stock added, reloading dashboard...');
+        loadDashboard(); // Refresh dashboard stats
+      });
+
+      realtimeClient.on('customer:added', (data) => {
+        console.log('Customer added, reloading dashboard...');
+        loadDashboard(); // Refresh dashboard stats
+      });
+
+      realtimeClient.on('payment:received', (data) => {
+        console.log('Payment received, reloading dashboard...');
+        loadDashboard(); // Refresh dashboard stats
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+
+COMPREHENSIVE TEST REPORT
+Generated: 2026-03-28T14:36:32.138Z
+==========================================================
+
+SUMMARY:
+- Total Tests: 81
+- Passed: 79
+- Failed: 2
+- Warnings: 0
+- Success Rate: 97.53%
+
+PASSED TESTS:
+  ✅ Directory Structure: app directory exists
+  ✅ Directory Structure: frontend directory exists
+  ✅ Directory Structure: node_modules directory exists
+  ✅ Directory Structure: backups directory exists
+  ✅ Directory Structure: uploads directory exists
+  ✅ Required Files: main.js exists
+  ✅ Required Files: server.js exists
+  ✅ Required Files: database.js exists
+  ✅ Required Files: backup-manager.js exists
+  ✅ Required Files: database-import.js exists
+  ✅ Required Files: realtime-sync.js exists
+  ✅ Required Files: .env exists
+  ✅ Required Files: settings.json exists
+  ✅ Required Files: package.json exists
+  ✅ Required Files: frontend/login.html exists
+  ✅ Required Files: frontend/dashboard.html exists
+  ✅ Required Files: frontend/billing_v2_enhanced.html exists
+  ✅ Required Files: frontend/products.html exists
+  ✅ Required Files: frontend/add_product.html exists
+  ✅ Required Files: frontend/add_stock.html exists
+  ✅ Required Files: frontend/customers.html exists
+  ✅ Required Files: frontend/view-bills.html exists
+  ✅ Required Files: frontend/daily_profit.html exists
+  ✅ Required Files: frontend/out-of-stock.html exists
+  ✅ Required Files: frontend/purchase-history.html exists
+  ✅ Required Files: frontend/payment_only.html exists
+  ✅ Required Files: frontend/import-database.html exists
+  ✅ Required Files: frontend/barcodeHandler.js exists
+  ✅ Required Files: frontend/barcodeCache.js exists
+  ✅ Required Files: frontend/searchProducts.js exists
+  ✅ Required Files: frontend/realtimeClient.js exists
+  ✅ Required Files: frontend/auth-check.js exists
+  ✅ Node Modules: express installed
+  ✅ Node Modules: sqlite3 installed
+  ✅ Node Modules: cors installed
+  ✅ Node Modules: dotenv installed
+  ✅ Node Modules: multer installed
+  ✅ Node Modules: ws installed
+  ✅ Node Modules: node-cron installed
+  ✅ Node Modules: @aws-sdk/client-s3 installed
+  ✅ Database Creation: Database file created successfully
+  ✅ Database Schema: bill_items table created successfully
+  ✅ Database Schema: payments table created successfully
+  ✅ Database Schema: stock_history table created successfully
+  ✅ Database Schema: products table created successfully
+  ✅ Database Schema: users table created successfully
+  ✅ Database Schema: customers table created successfully
+  ✅ Database Schema: bills table created successfully
+  ✅ Default User: Admin user created successfully
+  ✅ Database Connection: Connected to database successfully
+  ✅ INSERT Operation: Product inserted with ID: 1
+  ✅ SELECT Operation: Product retrieved: Test Product
+  ✅ UPDATE Operation: Product stock updated
+  ✅ DELETE Operation: Product deleted
+  ✅ Backup Directory: Backup directory exists
+  ✅ Backup Creation: Backup created: shopdb_2026-03-28_test.db
+  ✅ Backup Verification: Backup size: 49152 bytes
+  ✅ .env Configuration: R2 credentials configured
+  ✅ settings.json: Report folder: D:\reports dec 2025
+  ✅ HTML Pages: login.html is valid HTML
+  ✅ HTML Pages: dashboard.html is valid HTML
+  ✅ HTML Pages: products.html is valid HTML
+  ✅ HTML Pages: add_product.html is valid HTML
+  ✅ HTML Pages: add_stock.html is valid HTML
+  ✅ HTML Pages: customers.html is valid HTML
+  ✅ HTML Pages: view-bills.html is valid HTML
+  ✅ HTML Pages: daily_profit.html is valid HTML
+  ✅ HTML Pages: out-of-stock.html is valid HTML
+  ✅ HTML Pages: purchase-history.html is valid HTML
+  ✅ HTML Pages: payment_only.html is valid HTML
+  ✅ HTML Pages: import-database.html is valid HTML
+  ✅ JavaScript Modules: server.js contains expected code
+  ✅ JavaScript Modules: database.js contains expected code
+  ✅ JavaScript Modules: backup-manager.js contains expected code
+  ✅ JavaScript Modules: database-import.js contains expected code
+  ✅ JavaScript Modules: realtime-sync.js contains expected code
+  ✅ JavaScript Modules: frontend/barcodeHandler.js contains expected code
+  ✅ JavaScript Modules: frontend/realtimeClient.js contains expected code
+  ✅ Executable: Executable exists (203.69 MB)
+
+FAILED TESTS:
+  ❌ HTML Pages: billing_v2_enhanced.html is valid HTML
+  ❌ JavaScript Modules: frontend/searchProducts.js contains expected code
+
+
+
+==========================================================

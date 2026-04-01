@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Negative Input Prevention Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #2196F3;
+        }
+        .test-section h2 {
+            color: #2196F3;
+            margin-top: 0;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #2196F3;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left-color: #4CAF50;
+        }
+        .code {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.blocked {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .status.allowed {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🛡️ Negative Input Prevention Test</h1>
+        
+        <div class="info success">
+            <strong>✅ Real-time Validation Active</strong><br>
+            Try typing negative numbers (e.g., -100, -50) in the fields below. 
+            The minus sign will be automatically removed as you type!
+        </div>
+
+        <div class="test-section">
+            <h2>Test 1: Quantity Input</h2>
+            <div class="form-group">
+                <label for="test-qty">Quantity (Try typing -10):</label>
+                <input type="number" id="test-qty" placeholder="Enter quantity">
+                <div id="qty-status" class="status"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Purchase Price Input</h2>
+            <div class="form-group">
+                <label for="test-price">Purchase Price (Try typing -100):</label>
+                <input type="number" id="test-price" placeholder="Enter price">
+                <div id="price-status" class="status"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Retail Price Input</h2>
+            <div class="form-group">
+                <label for="test-retail">Retail Price (Try typing -50):</label>
+                <input type="number" id="test-retail" placeholder="Enter retail price">
+                <div id="retail-status" class="status"></div>
+            </div>
+        </div>
+
+        <div class="info">
+            <strong>📋 Implementation Details:</strong>
+            <div class="code">
+input.addEventListener("input", function(e) {<br>
+&nbsp;&nbsp;let value = e.target.value;<br>
+&nbsp;&nbsp;// Remove minus sign and non-numeric chars<br>
+&nbsp;&nbsp;value = value.replace(/[^0-9.]/g, '');<br>
+&nbsp;&nbsp;if (e.target.value !== value) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;e.target.value = value;<br>
+&nbsp;&nbsp;}<br>
+});
+            </div>
+        </div>
+
+        <div class="info success">
+            <strong>✅ Applied to Files:</strong><br>
+            • frontend/add_stock.html - Quantity, Purchase Price, Extra Expenses<br>
+            • frontend/add_product.html - All number inputs (7 fields)<br>
+            • Backend validation remains as additional security layer
+        </div>
+    </div>
+
+    <script>
+        // Apply the same validation logic to test inputs
+        function preventNegative(inputId, statusId) {
+            const input = document.getElementById(inputId);
+            const status = document.getElementById(statusId);
+            
+            input.addEventListener("input", function(e) {
+                const originalValue = e.target.value;
+                let value = originalValue;
+                
+                // Remove minus sign and any non-numeric characters except decimal point
+                value = value.replace(/[^0-9.]/g, '');
+                
+                if (originalValue !== value) {
+                    e.target.value = value;
+                    status.textContent = '🚫 Negative value blocked! Minus sign removed.';
+                    status.className = 'status blocked';
+                } else if (value) {
+                    status.textContent = '✅ Valid input: ' + value;
+                    status.className = 'status allowed';
+                } else {
+                    status.textContent = '';
+                    status.className = 'status';
+                }
+            });
+        }
+
+        // Apply to all test inputs
+        preventNegative('test-qty', 'qty-status');
+        preventNegative('test-price', 'price-status');
+        preventNegative('test-retail', 'retail-status');
+    </script>
+</body>
+</html>

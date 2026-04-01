@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Payment Only</title>
+<style>
+body{
+  font-family:Arial;
+  max-width:500px;
+  margin:40px auto;
+}
+input, select, button{
+  padding:8px;
+  width:100%;
+  margin-top:10px;
+}
+#info{
+  margin-top:15px;
+  padding:10px;
+  background:#e8f5e9;
+  border:1px solid #a5d6a7;
+  display:none;
+}
+</style>
+</head>
+<body>
+
+<h2>Payment Only Receipt</h2>
+
+<div style="position:relative;">
+  <input
+    id="customerSearch"
+    placeholder="Search customer"
+    autocomplete="off"
+  >
+
+  <div
+    id="customerSuggest"
+    style="
+      position:absolute;
+      top:100%;
+      left:0;
+      width:100%;
+      background:white;
+      border:1px solid #ddd;
+      max-height:200px;
+      overflow-y:auto;
+      display:none;
+      z-index:9999;
+    ">
+  </div>
+</div>
+
+<input id="paidAmount" type="number" placeholder="Paid Amount">
+
+<button onclick="savePayment()">Save Payment</button>
+
+<div id="info"></div>
+
+<script>
+let selectedCustomer = null;
+let customerList = [];
+let custIndex = -1;
+
+const custInput = document.getElementById("customerSearch");
+const custBox   = document.getElementById("customerSuggest");
+
+custInput.addEventListener("input", async () => {
+  const q = custInput.value.trim();
+  custBox.innerHTML = "";
+  custBox.style.display = "none";
+  custIndex = -1;
+
+  if (!q) return;
+
+let all = [];
+
+try {
+  const res = await fetch(
+    "http://localhost:3000/customers?q=" + encodeURIComponent(q)
+  );
+
+  if (!res.ok) return;
+
+  all = await res.json();
+
+} catch (err) {
+  console.error("Customer search failed:", err);
+  return;
+}
+
+const ql = q.toLowerCase();
+
+// ✅ priority buckets
+const startsWith = [];
+const contains = [];
+
+all.forEach(c => {
+  const name = (c.name || "").toLowerCase();
+
+  if (name.startsWith(ql)) {
+    startsWith.push(c);
+  } else if (name.includes(ql)) {
+    contains.push(c);
+  }
+});
+
+// ✅ merge (startsWith first)
+customerList = [...startsWith, ...contains];
+
+if (!customerList.length) return;
+
+  if (!customerList.length) return;
+
+  customerList.forEach((c, i) => {
+    const div = document.createElement("div");
+    div.textContent = `${c.name} (${c.mobile || "-"}) | OB ₹${c.old_balance}`;
+    div.style.padding = "6px 8px";
+    div.style.cursor = "pointer";
+    div.style.borderBottom = "1px solid #eee";
+
+    div.onclick = () => selectCustomer(i);
+    custBox.appendChild(div);
+  });
+
+  custBox.style.display = "block";
+});
+
+custInput.addEventListener("keydown", e => {
+  if (custBox.style.display !== "block") return;
+
+  const items = custBox.children;
+  if (!items.length) return;
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    custIndex = Math.min(custIndex + 1, items.length - 1);
+  }
+
+  if (e.key === "ArrowUp") {
+    e.preventDefault();
+    custIndex = Math.max(custIndex - 1, 0);
+  }
+
+  if (e.key === "Enter") {
+    e.preventDefault();
+    if (custIndex >= 0) selectCustomer(custIndex);
+  }
+
+  Array.from(items).forEach((el, i) => {
+    el.style.background = i === custIndex ? "#e6f3ff" : "";
+  });
+});
+
+function selectCustomer(i) {
+  const c = customerList[i];
+  if (!c) return;
+
+  selectedCustomer = c;
+  custInput.value = c.name;
+  custBox.style.display = "none";
+}
+
+document.addEventListener("click", e => {
+  if (!custBox.contains(e.target) && e.target !== custInput) {
+    custBox.style.display = "none";
+  }
+});
+
+async function savePayment(){
+  if (!selectedCustomer) {
+    alert("Select customer");
+    return;
+  }
+
+  const paid = Number(document.getElementById("paidAmount").value || 0);
+
+let data;
+
+try {
+  const res = await fetch("http://localhost:3000/payment-only", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      customer_id: selectedCustomer.id,
+      paid_amount: paid
+    })
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    alert(errorText || "Failed");
+    return;
+  }
+
+  data = await res.json();
+
+} catch (err) {
+  console.error("Payment save failed:", err);
+  alert("Server connection failed");
+  return;
+}
+
+  document.getElementById("info").style.display = "block";
+  document.getElementById("info").innerHTML = `
+    Old OB: ₹${data.old_balance}<br>
+    Paid: ₹${paid}<br>
+    New OB: ₹${data.new_balance}
+  `;
+}
+</script>
+
+</body>
+</html>

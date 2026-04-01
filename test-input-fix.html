@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Input Fix Test</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+  }
+  .test-section {
+    margin: 30px 0;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+  }
+  h2 {
+    color: #2563eb;
+  }
+  input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #f0f6ff;
+  }
+  .status {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+  .success {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  .info {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  button {
+    padding: 10px 20px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  button:hover {
+    background: #1d4ed8;
+  }
+</style>
+</head>
+<body>
+
+<h1>🔧 Input Field Fix Test</h1>
+
+<div class="status info">
+  <strong>Test Instructions:</strong><br>
+  1. Click into each input field below<br>
+  2. Type some text (e.g., "apple", "john", "123")<br>
+  3. Verify text appears in the correct field<br>
+  4. Scan a barcode (or type in hidden input and press Enter)<br>
+  5. Verify barcode scanning still works
+</div>
+
+<div class="test-section">
+  <h2>Test Case 1: Product Search</h2>
+  <label>Search product by name or price:</label>
+  <input type="text" id="productSearch" placeholder="Type 'apple' here">
+  <div class="status success" id="productResult" style="display:none;"></div>
+</div>
+
+<div class="test-section">
+  <h2>Test Case 2: Customer Search</h2>
+  <label>Search customer by name:</label>
+  <input type="text" id="customerSearch" placeholder="Type 'john' here">
+  <div class="status success" id="customerResult" style="display:none;"></div>
+</div>
+
+<div class="test-section">
+  <h2>Test Case 3: Quantity Input</h2>
+  <label>Enter quantity:</label>
+  <input type="text" id="quantityInput" placeholder="Type '5' here" inputmode="numeric">
+  <div class="status success" id="quantityResult" style="display:none;"></div>
+</div>
+
+<div class="test-section">
+  <h2>Test Case 4: Textarea</h2>
+  <label>Enter notes:</label>
+  <textarea id="notesInput" rows="4" placeholder="Type some notes here"></textarea>
+  <div class="status success" id="notesResult" style="display:none;"></div>
+</div>
+
+<div class="test-section">
+  <h2>Test Case 5: Barcode Scanner</h2>
+  <p>The hidden barcode input should capture scans when NO input field is focused.</p>
+  <button onclick="simulateBarcodeScan()">Simulate Barcode Scan</button>
+  <div class="status success" id="barcodeResult" style="display:none;"></div>
+</div>
+
+<div class="test-section">
+  <h2>Test Results</h2>
+  <div id="testResults"></div>
+</div>
+
+<script src="barcodeHandler.js"></script>
+<script>
+// Initialize barcode handler
+const barcodeHandler = new BarcodeHandler({
+  onScan: (barcode) => {
+    const result = document.getElementById('barcodeResult');
+    result.textContent = `✓ Barcode scanned successfully: ${barcode}`;
+    result.style.display = 'block';
+    console.log('Barcode scanned:', barcode);
+  },
+  onError: (error) => {
+    console.error('Barcode error:', error);
+    alert('Barcode Error: ' + error);
+  }
+});
+
+barcodeHandler.init();
+
+// Monitor input fields
+document.getElementById('productSearch').addEventListener('input', (e) => {
+  const result = document.getElementById('productResult');
+  result.textContent = `✓ Product search working! You typed: "${e.target.value}"`;
+  result.style.display = 'block';
+});
+
+document.getElementById('customerSearch').addEventListener('input', (e) => {
+  const result = document.getElementById('customerResult');
+  result.textContent = `✓ Customer search working! You typed: "${e.target.value}"`;
+  result.style.display = 'block';
+});
+
+document.getElementById('quantityInput').addEventListener('input', (e) => {
+  const result = document.getElementById('quantityResult');
+  result.textContent = `✓ Quantity input working! You typed: "${e.target.value}"`;
+  result.style.display = 'block';
+});
+
+document.getElementById('notesInput').addEventListener('input', (e) => {
+  const result = document.getElementById('notesResult');
+  result.textContent = `✓ Textarea working! You typed: "${e.target.value}"`;
+  result.style.display = 'block';
+});
+
+// Simulate barcode scan
+function simulateBarcodeScan() {
+  const hiddenInput = document.getElementById('barcode-scanner-input');
+  if (hiddenInput) {
+    hiddenInput.value = '8901030895487';
+    hiddenInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+  }
+}
+
+// Test summary
+setTimeout(() => {
+  const results = document.getElementById('testResults');
+  results.innerHTML = `
+    <div class="status info">
+      <strong>Expected Behavior:</strong><br>
+      ✓ All input fields should accept keyboard input normally<br>
+      ✓ Hidden scanner input should NOT capture text when typing in fields<br>
+      ✓ Barcode scanning should work when no input is focused<br>
+      ✓ Clicking outside inputs should restore scanner focus
+    </div>
+  `;
+}, 1000);
+</script>
+
+</body>
+</html>
