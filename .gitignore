@@ -35,5 +35,7 @@ node_modules/
 *.zip
 TEST_PORTABLE/
 TEST_EXTRACTION/
-dist/
-build/
+
+# Large production files
+Punchiri_POS_*.zip
+*.zip
