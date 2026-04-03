@@ -8,7 +8,8 @@
     "build": "electron-builder",
     "dist": "electron-builder",
     "electron-build": "electron-builder",
-    "package": "electron-packager . \"Punchiri Billing System\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"^/(dist|backups|.git|.kiro|.vscode)\" --prune=false"
+    "package": "electron-packager . \"Punchiri Billing System\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"^/(dist|backups|.git|.kiro|.vscode)\" --prune=false",
+    "release": "node simple-release.js"
   },
   "build": {
     "appId": "com.punchiri.pos",
@@ -26,8 +27,12 @@
       "!*.db"
     ],
     "win": {
-      "target": "nsis",
-      "verifyUpdateCodeSignature": false
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,
@@ -50,6 +55,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1011.0",
+    "@octokit/rest": "^22.0.1",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "electron-updater": "^6.8.3",
