@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Non-Blocking Popup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Non-Blocking Popup System</h1>
+        
+        <div class="test-section">
+            <h3>Test 1: Simple Alert</h3>
+            <button onclick="testAlert()">Show Alert</button>
+            <div id="status1" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 2: Confirm Dialog</h3>
+            <button onclick="testConfirm()">Show Confirm</button>
+            <div id="status2" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 3: Toast Notification</h3>
+            <button onclick="testToast('success')">Success Toast</button>
+            <button onclick="testToast('error')">Error Toast</button>
+            <button onclick="testToast('warning')">Warning Toast</button>
+            <button onclick="testToast('info')">Info Toast</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 4: Focus Restoration</h3>
+            <input type="text" id="testInput" placeholder="Type here...">
+            <button onclick="testFocusRestore()">Trigger Alert</button>
+            <div id="status4" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 5: Multiple Alerts</h3>
+            <button onclick="testMultiple()">Show 3 Alerts</button>
+            <div id="status5" class="status"></div>
+        </div>
+    </div>
+    
+    <!-- Load non-blocking UI system -->
+    <script src="nonBlockingUI.js"></script>
+    
+    <script>
+        async function testAlert() {
+            const status = document.getElementById('status1');
+            status.style.display = 'block';
+            status.textContent = 'Alert triggered...';
+            
+            await alert('This is a non-blocking alert!');
+            
+            status.textContent = '✅ Alert closed! UI was not frozen.';
+        }
+        
+        async function testConfirm() {
+            const status = document.getElementById('status2');
+            status.style.display = 'block';
+            status.textContent = 'Confirm triggered...';
+            
+            const result = await confirm('Do you want to continue?');
+            
+            status.textContent = result 
+                ? '✅ You clicked OK' 
+                : '❌ You clicked Cancel';
+        }
+        
+        function testToast(type) {
+            const messages = {
+                success: 'Operation completed successfully!',
+                error: 'An error occurred!',
+                warning: 'Warning: Please check your input',
+                info: 'This is an informational message'
+            };
+            
+            nbToast(messages[type], type);
+        }
+        
+        async function testFocusRestore() {
+            const input = document.getElementById('testInput');
+            const status = document.getElementById('status4');
+            
+            status.style.display = 'block';
+            status.textContent = 'Focus on input, then alert will show...';
+            
+            input.focus();
+            
+            await alert('After closing this, focus should return to the input!');
+            
+            setTimeout(() => {
+                if (document.activeElement === input) {
+                    status.textContent = '✅ Focus restored correctly!';
+                } else {
+                    status.textContent = '❌ Focus not restored';
+                }
+            }, 200);
+        }
+        
+        async function testMultiple() {
+            const status = document.getElementById('status5');
+            status.style.display = 'block';
+            
+            status.textContent = 'Alert 1 of 3...';
+            await alert('First alert');
+            
+            status.textContent = 'Alert 2 of 3...';
+            await alert('Second alert');
+            
+            status.textContent = 'Alert 3 of 3...';
+            await alert('Third alert');
+            
+            status.textContent = '✅ All 3 alerts completed!';
+        }
+        
+        // Log when script loads
+        console.log('Test page loaded');
+        console.log('alert function:', typeof window.alert);
+        console.log('confirm function:', typeof window.confirm);
+        console.log('nbAlert function:', typeof window.nbAlert);
+        console.log('nbConfirm function:', typeof window.nbConfirm);
+        console.log('nbToast function:', typeof window.nbToast);
+    </script>
+</body>
+</html>

@@ -897,15 +897,11 @@ function renderBills(bills){
   <button class="btn btn-success btn-sm print-btn" data-bill='${escapeHtml(JSON.stringify(b))}'>
   Print
 </button>
+  <button class="btn btn-warning btn-sm" onclick="editBill(${b.id})">
+    Edit
+  </button>
 `;
 
-    if (isToday) {
-      buttons += `
-        <button class="btn btn-warning btn-sm" onclick="editBill(${b.id})">
-          Edit
-        </button>
-      `;
-    }
 
     div.innerHTML = `
       <div class="card-header">
@@ -1757,5 +1753,10 @@ function applyStylesToWorksheet(ws, styles) {
   });
 }
     </script>
+
+    <!-- Alert Fix - Prevents input lock after validation popups -->
+    <script src="nonBlockingUI.js"></script>
+    <!-- Global Focus Fix - Hard fix for UI freeze -->
+    <script src="globalFocusFix.js?v=2"></script>
 </body>
 </html>

@@ -1279,6 +1279,30 @@ body {
 <div class="store-info">
   <h1>Punchiri Store Billing</h1>
 </div>
+<!-- Real-time Connection Status -->
+<div id="realtimeStatus" style="
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+">
+  <span id="realtimeStatusDot" style="
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f59e0b;
+  "></span>
+  <span id="realtimeStatusText">Connecting...</span>
+</div>
     </div>
     
     <div class="tabs-container" id="tabs"></div>
@@ -1438,7 +1462,7 @@ body {
 
 <!-- Barcode System Scripts -->
 <script src="barcodeHandler.js"></script>
-<parameter name="barcodeCache.js"></script>
+<script src="barcodeCache.js"></script>
 
 <!-- Real-time Client -->
 <script src="realtimeClient.js"></script>
@@ -1454,10 +1478,12 @@ body {
  * @param {string} title - Dialog title (optional)
  * @returns {Promise<void>}
  */
-function showAlert(message, title = 'localhost:3000 says') {
+function showAlert(message, title = 'Validation') {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
+    overlay.style.pointerEvents = 'auto';
+    overlay.setAttribute('data-modal-active', 'true');
     
     overlay.innerHTML = `
       <div class="modal-dialog">
@@ -1477,40 +1503,83 @@ function showAlert(message, title = 'localhost:3000 says') {
     
     const okBtn = document.getElementById('modalOkBtn');
     
-    const close = () => {
-      overlay.remove();
-      resolve();
-    };
-    
-    okBtn.onclick = close;
-    overlay.onclick = (e) => {
-      if (e.target === overlay) close();
-    };
-    
-    // Focus OK button
-    setTimeout(() => okBtn.focus(), 100);
-    
-    // Handle Enter key
     const handleEnter = (e) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' || e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
         close();
-        document.removeEventListener('keydown', handleEnter);
       }
     };
+    
+    const close = () => {
+      // MANDATORY: Remove event listener FIRST
+      document.removeEventListener('keydown', handleEnter);
+      
+      // MANDATORY: Remove overlay
+      overlay.remove();
+      
+      // MANDATORY FIX 1: Force cleanup blocking overlays
+      setTimeout(() => {
+        document.querySelectorAll('*').forEach(el => {
+          const style = window.getComputedStyle(el);
+          if (
+            style.position === 'fixed' &&
+            parseInt(style.zIndex) > 9000 &&
+            !el.hasAttribute('data-modal-active')
+          ) {
+            el.style.pointerEvents = 'none';
+          }
+        });
+      }, 0);
+      
+      // MANDATORY FIX 2: Force restore pointer events
+      document.body.style.pointerEvents = 'auto';
+      document.documentElement.style.pointerEvents = 'auto';
+      
+      // MANDATORY FIX 3: Force reset focus
+      setTimeout(() => {
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+        document.body.focus();
+        
+        // MANDATORY FIX 4: Force Electron window focus
+        if (window.focus) {
+          window.focus();
+        }
+        
+        // Force reflow
+        void document.body.offsetHeight;
+      }, 0);
+      
+      setTimeout(() => resolve(), 10);
+    };
+    
+    okBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+    };
+    
+    overlay.onclick = (e) => {
+      if (e.target === overlay) {
+        e.preventDefault();
+        e.stopPropagation();
+        close();
+      }
+    };
+    
     document.addEventListener('keydown', handleEnter);
+    setTimeout(() => okBtn.focus(), 100);
   });
 }
 
-/**
- * Show custom confirm dialog
- * @param {string} message - Message to display
- * @param {string} title - Dialog title (optional)
- * @returns {Promise<boolean>} - true if confirmed, false if cancelled
- */
-function showConfirm(message, title = 'localhost:3000 says') {
+function showConfirm(message, title = 'Confirm') {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
+    overlay.style.pointerEvents = 'auto';
+    overlay.setAttribute('data-modal-active', 'true');
     
     overlay.innerHTML = `
       <div class="modal-dialog">
@@ -1532,43 +1601,93 @@ function showConfirm(message, title = 'localhost:3000 says') {
     const confirmBtn = document.getElementById('modalConfirmBtn');
     const cancelBtn = document.getElementById('modalCancelBtn');
     
-    const close = (result) => {
-      overlay.remove();
-      resolve(result);
-    };
-    
-    confirmBtn.onclick = () => close(true);
-    cancelBtn.onclick = () => close(false);
-    overlay.onclick = (e) => {
-      if (e.target === overlay) close(false);
-    };
-    
-    // Focus confirm button
-    setTimeout(() => confirmBtn.focus(), 100);
-    
-    // Handle Enter/Escape keys
     const handleKeys = (e) => {
       if (e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
         close(true);
-        document.removeEventListener('keydown', handleKeys);
       } else if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
         close(false);
-        document.removeEventListener('keydown', handleKeys);
       }
     };
+    
+    const close = (result) => {
+      // MANDATORY: Remove event listener FIRST
+      document.removeEventListener('keydown', handleKeys);
+      
+      // MANDATORY: Remove overlay
+      overlay.remove();
+      
+      // MANDATORY FIX 1: Force cleanup blocking overlays
+      setTimeout(() => {
+        document.querySelectorAll('*').forEach(el => {
+          const style = window.getComputedStyle(el);
+          if (
+            style.position === 'fixed' &&
+            parseInt(style.zIndex) > 9000 &&
+            !el.hasAttribute('data-modal-active')
+          ) {
+            el.style.pointerEvents = 'none';
+          }
+        });
+      }, 0);
+      
+      // MANDATORY FIX 2: Force restore pointer events
+      document.body.style.pointerEvents = 'auto';
+      document.documentElement.style.pointerEvents = 'auto';
+      
+      // MANDATORY FIX 3: Force reset focus
+      setTimeout(() => {
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+        document.body.focus();
+        
+        // MANDATORY FIX 4: Force Electron window focus
+        if (window.focus) {
+          window.focus();
+        }
+        
+        // Force reflow
+        void document.body.offsetHeight;
+      }, 0);
+      
+      setTimeout(() => resolve(result), 10);
+    };
+    
+    confirmBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      close(true);
+    };
+    
+    cancelBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      close(false);
+    };
+    
+    overlay.onclick = (e) => {
+      if (e.target === overlay) {
+        e.preventDefault();
+        e.stopPropagation();
+        close(false);
+      }
+    };
+    
     document.addEventListener('keydown', handleKeys);
+    setTimeout(() => confirmBtn.focus(), 100);
   });
 }
 
-/**
- * ✅ NEW: Show custom print dialog with Cancel button focused by default
- * @param {string} message - Message to display
- * @returns {Promise<boolean>} - true if print confirmed, false if cancelled
- */
 function showPrintDialog(message) {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
+    overlay.style.pointerEvents = 'auto';
+    overlay.setAttribute('data-modal-active', 'true');
     
     overlay.innerHTML = `
       <div class="modal-dialog">
@@ -1590,26 +1709,10 @@ function showPrintDialog(message) {
     const printBtn = document.getElementById('modalPrintBtn');
     const cancelBtn = document.getElementById('modalCancelBtn');
     
-    const close = (result) => {
-      document.removeEventListener('keydown', handleKeys);
-      overlay.remove();
-      resolve(result);
-    };
-    
-    printBtn.onclick = () => close(true);
-    cancelBtn.onclick = () => close(false);
-    overlay.onclick = (e) => {
-      if (e.target === overlay) close(false);
-    };
-    
-    // ✅ Focus Cancel button by default (as per requirement)
-    setTimeout(() => cancelBtn.focus(), 100);
-    
-    // ✅ Handle Arrow keys for navigation + Enter/Escape
     const handleKeys = (e) => {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
-        // Toggle focus between Cancel and Print
+        e.stopPropagation();
         if (document.activeElement === cancelBtn) {
           printBtn.focus();
         } else {
@@ -1617,7 +1720,7 @@ function showPrintDialog(message) {
         }
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        // Confirm whichever button is focused
+        e.stopPropagation();
         if (document.activeElement === printBtn) {
           close(true);
         } else {
@@ -1625,10 +1728,77 @@ function showPrintDialog(message) {
         }
       } else if (e.key === 'Escape') {
         e.preventDefault();
+        e.stopPropagation();
         close(false);
       }
     };
+    
+    const close = (result) => {
+      // MANDATORY: Remove event listener FIRST
+      document.removeEventListener('keydown', handleKeys);
+      
+      // MANDATORY: Remove overlay
+      overlay.remove();
+      
+      // MANDATORY FIX 1: Force cleanup blocking overlays
+      setTimeout(() => {
+        document.querySelectorAll('*').forEach(el => {
+          const style = window.getComputedStyle(el);
+          if (
+            style.position === 'fixed' &&
+            parseInt(style.zIndex) > 9000 &&
+            !el.hasAttribute('data-modal-active')
+          ) {
+            el.style.pointerEvents = 'none';
+          }
+        });
+      }, 0);
+      
+      // MANDATORY FIX 2: Force restore pointer events
+      document.body.style.pointerEvents = 'auto';
+      document.documentElement.style.pointerEvents = 'auto';
+      
+      // MANDATORY FIX 3: Force reset focus
+      setTimeout(() => {
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+        document.body.focus();
+        
+        // MANDATORY FIX 4: Force Electron window focus
+        if (window.focus) {
+          window.focus();
+        }
+        
+        // Force reflow
+        void document.body.offsetHeight;
+      }, 0);
+      
+      setTimeout(() => resolve(result), 10);
+    };
+    
+    printBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      close(true);
+    };
+    
+    cancelBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      close(false);
+    };
+    
+    overlay.onclick = (e) => {
+      if (e.target === overlay) {
+        e.preventDefault();
+        e.stopPropagation();
+        close(false);
+      }
+    };
+    
     document.addEventListener('keydown', handleKeys);
+    setTimeout(() => cancelBtn.focus(), 100);
   });
 }
 
@@ -2116,107 +2286,288 @@ function showRecoveryNotification(itemCount) {
 let barcodeHandler = null;
 
 (async function loadProducts(){
-  try {
-    const r = await fetch(`${API_BASE}/products`);
-    billingState.products = await r.json();
-    billingState.productsLoaded = true;
-    
-    // Legacy compatibility
-    products = billingState.products;
-    productsLoaded = billingState.productsLoaded;
-
-    // Load barcode cache
-    await barcodeCache.load();
-
-    // Initialize barcode handler
-    barcodeHandler = new BarcodeHandler({
-      onScan: handleBarcodeScanned,
-      onError: showBarcodeError
-    });
-    barcodeHandler.init();
-
-    if (isEditMode && editBillId) {
-      console.log("EDIT MODE: loading bill", editBillId);
-      await loadBillForEdit(editBillId);
-    } else {
-      // Load from localStorage if available
-      const restored = loadBillingStateFromStorage();
+  let retryCount = 0;
+  const maxRetries = 5;
+  
+  async function attemptLoad() {
+    try {
+      console.log(`Attempting to load products (attempt ${retryCount + 1}/${maxRetries})...`);
+      const r = await fetch(`${API_BASE}/products`, { 
+        timeout: 5000 
+      });
       
-      if (restored) {
-        console.log('✓ Restored billing state from localStorage');
-        
-        // Show recovery notification if there are items
-        const totalItems = Object.values(billingState.tabs).reduce(
-          (sum, tab) => sum + (tab.items?.length || 0), 0
-        );
-        
-        if (totalItems > 0) {
-          showRecoveryNotification(totalItems);
-        }
-      } else {
-        console.log('✓ Starting with fresh billing state');
+      if (!r.ok) {
+        throw new Error(`Server returned ${r.status}`);
       }
       
-      syncLegacyState();
-      renderBillingUI();
-    }
+      billingState.products = await r.json();
+      billingState.productsLoaded = true;
+      
+      // Legacy compatibility
+      products = billingState.products;
+      productsLoaded = billingState.productsLoaded;
 
-  } catch (e) {
-    console.error("Failed to load products", e);
-    showAlert("Products not loaded. Server offline.");
+      console.log(`✓ Products loaded successfully (${products.length} products)`);
+
+      // Load barcode cache
+      await barcodeCache.load();
+
+      // Initialize barcode handler
+      barcodeHandler = new BarcodeHandler({
+        onScan: handleBarcodeScanned,
+        onError: showBarcodeError
+      });
+      barcodeHandler.init();
+
+      if (isEditMode && editBillId) {
+        console.log("EDIT MODE: loading bill", editBillId);
+        await loadBillForEdit(editBillId);
+      } else {
+        // Load from localStorage if available
+        const restored = loadBillingStateFromStorage();
+        
+        if (restored) {
+          console.log('✓ Restored billing state from localStorage');
+          
+          // Show recovery notification if there are items
+          const totalItems = Object.values(billingState.tabs).reduce(
+            (sum, tab) => sum + (tab.items?.length || 0), 0
+          );
+          
+          if (totalItems > 0) {
+            showRecoveryNotification(totalItems);
+          }
+        } else {
+          console.log('✓ Starting with fresh billing state');
+        }
+        
+        syncLegacyState();
+        renderBillingUI();
+      }
+
+    } catch (e) {
+      console.error(`Failed to load products (attempt ${retryCount + 1}):`, e);
+      
+      retryCount++;
+      
+      if (retryCount < maxRetries) {
+        // Retry after delay
+        console.log(`Retrying in 1 second...`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return attemptLoad();
+      } else {
+        // Max retries reached - show non-blocking error
+        console.error("Max retries reached. Server appears to be offline.");
+        
+        // Only show error banner if we're on the billing page and visible
+        if (document.visibilityState === 'visible') {
+          // Show error but don't block UI
+          const errorDiv = document.createElement('div');
+          errorDiv.id = 'server-error-banner';
+          errorDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 9999;
+            max-width: 400px;
+            font-size: 14px;
+            font-weight: 500;
+          `;
+          errorDiv.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 20px;">⚠️</span>
+              <div>
+                <div style="font-weight: 600; margin-bottom: 4px;">Server Connection Failed</div>
+                <div style="font-size: 13px; opacity: 0.9;">Products could not be loaded. Please check if the server is running.</div>
+              </div>
+              <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; margin-left: auto;">×</button>
+            </div>
+          `;
+          
+          // Remove any existing error banner first
+          const existing = document.getElementById('server-error-banner');
+          if (existing) existing.remove();
+          
+          document.body.appendChild(errorDiv);
+          
+          // Auto-remove after 10 seconds
+          setTimeout(() => {
+            if (errorDiv.parentElement) errorDiv.remove();
+          }, 10000);
+        }
+        
+        // Still initialize UI with empty products
+        billingState.products = [];
+        billingState.productsLoaded = false;
+        products = [];
+        productsLoaded = false;
+        
+        syncLegacyState();
+        renderBillingUI();
+      }
+    }
   }
+  
+  await attemptLoad();
 })();
 
 // ========== REAL-TIME UPDATES FOR BILLING ==========
 if (window.realtimeClient) {
+  console.log('✓ Real-time client available, setting up event handlers...');
+  
+  // Check connection status
+  setTimeout(() => {
+    if (window.realtimeClient.isConnected) {
+      console.log('✓ WebSocket connected successfully');
+    } else {
+      console.warn('⚠ WebSocket not connected yet');
+    }
+  }, 1000);
+  
   // Reload products when they're updated
   realtimeClient.on('product:added', async (data) => {
-    console.log('Product added, reloading products...');
+    console.log('🔔 Product added event received:', data);
     try {
       const r = await fetch(`${API_BASE}/products`);
       billingState.products = await r.json();
       products = billingState.products;
       await barcodeCache.load(); // Refresh cache
+      
+      // Show notification
+      if (window.nbToast) {
+        nbToast(`✓ New product added: ${data.name}`, 'success', 3000);
+      }
+      
+      console.log(`✓ Products reloaded (${products.length} products)`);
     } catch (e) {
       console.error('Failed to reload products:', e);
     }
   });
 
   realtimeClient.on('product:updated', async (data) => {
-    console.log('Product updated, reloading products...');
+    console.log('Product updated, reloading products...', data);
     try {
       const r = await fetch(`${API_BASE}/products`);
       billingState.products = await r.json();
       products = billingState.products;
       await barcodeCache.load(); // Refresh cache
+      
+      // Show notification
+      if (window.nbToast) {
+        nbToast(`✓ Product updated: ${data.name}`, 'info', 3000);
+      }
+      
+      console.log(`✓ Products reloaded (${products.length} products)`);
     } catch (e) {
       console.error('Failed to reload products:', e);
     }
   });
 
   realtimeClient.on('stock:added', async (data) => {
-    console.log('Stock added, reloading products...');
+    console.log('Stock added, reloading products...', data);
     try {
       const r = await fetch(`${API_BASE}/products`);
       billingState.products = await r.json();
       products = billingState.products;
       await barcodeCache.load(); // Refresh cache
+      
+      // Show notification
+      if (window.nbToast) {
+        nbToast('✓ Stock updated', 'success', 3000);
+      }
+      
+      console.log(`✓ Products reloaded (${products.length} products)`);
     } catch (e) {
       console.error('Failed to reload products:', e);
     }
   });
 
   realtimeClient.on('price:updated', async (data) => {
-    console.log('Price updated, reloading products...');
+    console.log('Price updated, reloading products...', data);
     try {
       const r = await fetch(`${API_BASE}/products`);
       billingState.products = await r.json();
       products = billingState.products;
+      
+      // Show notification
+      if (window.nbToast) {
+        nbToast('✓ Price updated', 'info', 3000);
+      }
+      
+      console.log(`✓ Products reloaded (${products.length} products)`);
     } catch (e) {
       console.error('Failed to reload products:', e);
     }
   });
+  
+  // Connection status handlers
+  realtimeClient.on('connected', () => {
+    console.log('✓ Real-time sync connected');
+    // Remove any connection error indicators
+    const errorBanner = document.getElementById('realtime-error-banner');
+    if (errorBanner) errorBanner.remove();
+    
+    // Update status indicator
+    updateRealtimeStatus('connected');
+  });
+  
+  realtimeClient.on('disconnected', () => {
+    console.warn('⚠ Real-time sync disconnected');
+    // Show reconnection notice
+    if (window.nbToast) {
+      nbToast('⚠ Real-time sync disconnected, reconnecting...', 'warning', 3000);
+    }
+    
+    // Update status indicator
+    updateRealtimeStatus('disconnected');
+  });
+} else {
+  console.error('❌ Real-time client not available!');
+  updateRealtimeStatus('error');
 }
+
+// Function to update real-time connection status indicator
+function updateRealtimeStatus(status) {
+  const statusDiv = document.getElementById('realtimeStatus');
+  const statusDot = document.getElementById('realtimeStatusDot');
+  const statusText = document.getElementById('realtimeStatusText');
+  
+  if (!statusDiv || !statusDot || !statusText) return;
+  
+  if (status === 'connected') {
+    statusDiv.style.background = '#d1fae5';
+    statusDiv.style.color = '#065f46';
+    statusDiv.style.borderColor = '#a7f3d0';
+    statusDot.style.background = '#10b981';
+    statusText.textContent = 'Live';
+  } else if (status === 'disconnected') {
+    statusDiv.style.background = '#fef3c7';
+    statusDiv.style.color = '#92400e';
+    statusDiv.style.borderColor = '#fde68a';
+    statusDot.style.background = '#f59e0b';
+    statusText.textContent = 'Reconnecting...';
+  } else if (status === 'error') {
+    statusDiv.style.background = '#fee2e2';
+    statusDiv.style.color = '#991b1b';
+    statusDiv.style.borderColor = '#fecaca';
+    statusDot.style.background = '#ef4444';
+    statusText.textContent = 'Offline';
+  }
+}
+
+// Check initial connection status
+setTimeout(() => {
+  if (window.realtimeClient && window.realtimeClient.isConnected) {
+    updateRealtimeStatus('connected');
+  } else {
+    updateRealtimeStatus('disconnected');
+  }
+}, 2000);
 
 // ========== BARCODE SCAN HANDLER ==========
 async function handleBarcodeScanned(barcode) {
@@ -3262,8 +3613,12 @@ function handleSearchKeys(e){
       if(f){ 
         billingState.selectedProduct = f;
         selected = f;
-        $('prodSearch').value = f.name; 
-        $('enterVal').focus(); 
+        $('prodSearch').value = f.name;
+        
+        // Set default quantity to 1
+        $('enterVal').value = '1';
+        $('enterVal').focus();
+        $('enterVal').select(); // Select the text so user can type over it
       }
     }
   }
@@ -3283,7 +3638,11 @@ function pickMatch(i){
   selected = billingState.selectedProduct;
   $('prodSearch').value = billingState.selectedProduct.name;
   $('suggest').style.display = 'none';
+  
+  // Set default quantity to 1
+  $('enterVal').value = '1';
   $('enterVal').focus();
+  $('enterVal').select(); // Select the text so user can type over it
 }
 
 $('prodSearch').addEventListener('blur', ()=> setTimeout(()=> $('suggest').style.display='none', 120));
@@ -4020,5 +4379,11 @@ window.addEventListener("load", () => {
   }
 });
 </script>
+
+<!-- Alert Fix - Prevents input lock after validation popups -->
+<script src="nonBlockingUI.js"></script>
+<!-- Global Focus Fix - Hard fix for UI freeze -->
+<script src="globalFocusFix.js?v=2"></script>
+
 </body>
 </html>

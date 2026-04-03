@@ -403,23 +403,78 @@
         /* ============ ACTIONS MENU ============ */
         .actions-cell {
             text-align: center;
+            position: relative;
         }
 
-        .btn-edit-barcode {
-            background: var(--primary);
-            color: white;
+        /* Three-dot menu button */
+        .menu-btn {
+            background: transparent;
             border: none;
-            padding: 6px 12px;
-            border-radius: var(--radius-sm);
-            font-size: 0.85rem;
+            font-size: 20px;
             cursor: pointer;
+            padding: 4px 8px;
+            color: var(--text-light);
             transition: all 0.2s;
-            font-weight: 500;
+            border-radius: 4px;
+            position: relative;
         }
 
-        .btn-edit-barcode:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
+        .menu-btn:hover {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        /* Dropdown menu */
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 4px);
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 160px;
+            z-index: 9999;
+            display: none;
+            margin: 0;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg);
+        }
+
+        .dropdown-item:first-child {
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 var(--radius) var(--radius);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
         }
 
         /* ============ EDIT BARCODE MODAL ============ */
@@ -769,9 +824,14 @@
                             </div>
                         </td>
                         <td class="actions-cell">
-                            <button class="btn-edit-barcode" onclick="openEditBarcodeModal(${p.id}, '${(p.barcode || '').replace(/'/g, "\\'")}')">
-                                ✏️ Edit Barcode
-                            </button>
+                            <div style="position: relative; display: inline-block;">
+                                <button class="menu-btn" onclick="toggleMenu(event, ${p.id})">⋮</button>
+                                <div class="dropdown-menu" id="menu-${p.id}">
+                                    <button class="dropdown-item" onclick="openEditBarcodeModal(${p.id}, '${(p.barcode || '').replace(/'/g, "\\'")}')">
+                                        ✏️ Edit Barcode
+                                    </button>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -1101,6 +1161,30 @@ if (!res.ok) {
 
     <!-- Real-time Client -->
     <script src="realtimeClient.js"></script>
+    
+    <script>
+        // ============ REAL-TIME UPDATES ============
+        // Listen for product additions
+        window.realtimeClient.on('product:added', (data) => {
+            console.log('Product added via real-time:', data);
+            // Reload products to show new product
+            loadProducts();
+        });
+        
+        // Listen for product updates
+        window.realtimeClient.on('product:updated', (data) => {
+            console.log('Product updated via real-time:', data);
+            // Reload products to show updates
+            loadProducts();
+        });
+        
+        // Listen for stock updates
+        window.realtimeClient.on('stock:updated', (data) => {
+            console.log('Stock updated via real-time:', data);
+            // Reload products to show stock changes
+            loadProducts();
+        });
+    </script>
 
     <!-- Edit Barcode Modal -->
     <div class="modal-overlay" id="editBarcodeModal">
@@ -1123,8 +1207,40 @@ if (!res.ok) {
         // Global variable to store current editing product ID
         let currentEditingProductId = null;
 
+        // Toggle dropdown menu
+        function toggleMenu(event, productId) {
+            event.stopPropagation();
+            
+            const menu = document.getElementById(`menu-${productId}`);
+            const allMenus = document.querySelectorAll('.dropdown-menu');
+            
+            // Close all other menus
+            allMenus.forEach(m => {
+                if (m !== menu) {
+                    m.classList.remove('show');
+                }
+            });
+            
+            // Toggle current menu
+            menu.classList.toggle('show');
+        }
+
+        // Close all menus when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.menu-btn') && !event.target.closest('.dropdown-menu')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+
         // Open edit barcode modal
         function openEditBarcodeModal(productId, currentBarcode) {
+            // Close the dropdown menu
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+            
             currentEditingProductId = productId;
             document.getElementById('barcodeInput').value = currentBarcode || '';
             document.getElementById('editBarcodeModal').classList.add('show');
@@ -1201,5 +1317,10 @@ if (!res.ok) {
             }
         });
     </script>
+
+    <!-- Alert Fix - Prevents input lock after validation popups -->
+    <script src="nonBlockingUI.js"></script>
+    <!-- Global Focus Fix - Hard fix for UI freeze -->
+    <script src="globalFocusFix.js?v=2"></script>
 </body>
 </html>

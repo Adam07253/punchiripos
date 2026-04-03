@@ -1,10 +1,10 @@
 # Dependencies
 node_modules/
 
-# Environment variables
+# Environment variables (DO NOT COMMIT)
 .env
 
-# Database files
+# Database files (DO NOT COMMIT)
 *.db
 *.db-shm
 *.db-wal
@@ -30,7 +30,6 @@ Thumbs.db
 # Build outputs
 dist/
 build/
-node_modules/
 *.exe
 *.zip
 TEST_PORTABLE/
@@ -38,4 +37,9 @@ TEST_EXTRACTION/
 
 # Large production files
 Punchiri_POS_*.zip
-*.zip
+
+# Settings (user-specific)
+settings.json
+
+# GitHub token (DO NOT COMMIT)
+GH_TOKEN

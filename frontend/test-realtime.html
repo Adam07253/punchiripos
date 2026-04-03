@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Connection Test</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2563eb;
+      margin-bottom: 20px;
+    }
+    .status {
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+      font-weight: 600;
+    }
+    .status.success {
+      background: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid #10b981;
+    }
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border-left: 4px solid #ef4444;
+    }
+    .status.warning {
+      background: #fef3c7;
+      color: #92400e;
+      border-left: 4px solid #f59e0b;
+    }
+    .log {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      max-height: 400px;
+      overflow-y: auto;
+      margin: 20px 0;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 3px solid transparent;
+    }
+    .log-entry.info { border-left-color: #3b82f6; }
+    .log-entry.success { border-left-color: #10b981; }
+    .log-entry.error { border-left-color: #ef4444; }
+    .log-entry.warning { border-left-color: #f59e0b; }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔌 Real-Time Connection Test</h1>
+    
+    <div id="connectionStatus" class="status warning">
+      ⏳ Initializing...
+    </div>
+    
+    <div class="test-section">
+      <h3>Connection Tests</h3>
+      <button onclick="testServerConnection()">Test Server (HTTP)</button>
+      <button onclick="testWebSocket()">Test WebSocket</button>
+      <button onclick="testProductsFetch()">Test Products API</button>
+      <button onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <div class="test-section">
+      <h3>Event Log</h3>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+  <script src="realtimeClient.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:3000';
+    const statusDiv = document.getElementById('connectionStatus');
+    const logDiv = document.getElementById('log');
+    
+    function addLog(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      const timestamp = new Date().toLocaleTimeString();
+      entry.textContent = `[${timestamp}] ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+    
+    function updateStatus(message, type) {
+      statusDiv.className = `status ${type}`;
+      statusDiv.textContent = message;
+    }
+    
+    function clearLog() {
+      logDiv.innerHTML = '';
+      addLog('Log cleared', 'info');
+    }
+    
+    // Test server connection
+    async function testServerConnection() {
+      addLog('Testing HTTP server connection...', 'info');
+      try {
+        const response = await fetch(`${API_BASE}/products`);
+        if (response.ok) {
+          const products = await response.json();
+          addLog(`✓ Server is running! Found ${products.length} products`, 'success');
+          return true;
+        } else {
+          addLog(`✗ Server returned status ${response.status}`, 'error');
+          return false;
+        }
+      } catch (error) {
+        addLog(`✗ Server connection failed: ${error.message}`, 'error');
+        return false;
+      }
+    }
+    
+    // Test WebSocket connection
+    function testWebSocket() {
+      addLog('Testing WebSocket connection...', 'info');
+      
+      if (!window.realtimeClient) {
+        addLog('✗ realtimeClient not found!', 'error');
+        return;
+      }
+      
+      if (window.realtimeClient.isConnected) {
+        addLog('✓ WebSocket is connected!', 'success');
+        addLog(`WebSocket URL: ${window.realtimeClient.url}`, 'info');
+      } else {
+        addLog('✗ WebSocket is not connected', 'error');
+        addLog('Attempting to reconnect...', 'warning');
+        window.realtimeClient.connect();
+      }
+    }
+    
+    // Test products fetch
+    async function testProductsFetch() {
+      addLog('Fetching products from API...', 'info');
+      try {
+        const response = await fetch(`${API_BASE}/products`);
+        if (response.ok) {
+          const products = await response.json();
+          addLog(`✓ Fetched ${products.length} products`, 'success');
+          if (products.length > 0) {
+            addLog(`Sample product: ${products[0].name} (ID: ${products[0].id})`, 'info');
+          }
+        } else {
+          addLog(`✗ Failed to fetch products: ${response.status}`, 'error');
+        }
+      } catch (error) {
+        addLog(`✗ Error fetching products: ${error.message}`, 'error');
+      }
+    }
+    
+    // Initialize
+    addLog('Initializing real-time connection test...', 'info');
+    
+    // Check if realtimeClient exists
+    if (window.realtimeClient) {
+      addLog('✓ realtimeClient loaded', 'success');
+      
+      // Monitor connection status
+      setTimeout(() => {
+        if (window.realtimeClient.isConnected) {
+          updateStatus('✓ WebSocket Connected', 'success');
+          addLog('✓ WebSocket connected successfully', 'success');
+        } else {
+          updateStatus('✗ WebSocket Not Connected', 'error');
+          addLog('✗ WebSocket failed to connect', 'error');
+        }
+      }, 2000);
+      
+      // Listen for connection events
+      window.realtimeClient.on('connected', () => {
+        updateStatus('✓ WebSocket Connected', 'success');
+        addLog('✓ WebSocket connected', 'success');
+      });
+      
+      window.realtimeClient.on('disconnected', () => {
+        updateStatus('✗ WebSocket Disconnected', 'error');
+        addLog('✗ WebSocket disconnected', 'error');
+      });
+      
+      // Listen for product events
+      window.realtimeClient.on('product:added', (data) => {
+        addLog(`🔔 Product added: ${data.name}`, 'success');
+      });
+      
+      window.realtimeClient.on('product:updated', (data) => {
+        addLog(`🔔 Product updated: ${data.name}`, 'info');
+      });
+      
+      window.realtimeClient.on('stock:added', (data) => {
+        addLog(`🔔 Stock added for product ID: ${data.product_id}`, 'success');
+      });
+      
+      window.realtimeClient.on('price:updated', (data) => {
+        addLog(`🔔 Price updated: ${data.name}`, 'info');
+      });
+      
+    } else {
+      updateStatus('✗ realtimeClient Not Found', 'error');
+      addLog('✗ realtimeClient.js not loaded!', 'error');
+    }
+    
+    // Auto-test on load
+    setTimeout(async () => {
+      await testServerConnection();
+      testWebSocket();
+    }, 1000);
+  </script>
+</body>
+</html>

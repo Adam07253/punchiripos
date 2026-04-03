@@ -1,5 +1,5 @@
-appId: com.punchiri.billingsystem
-productName: Punchiri Billing System
+appId: com.punchiri.pos
+productName: Punchiri POS
 asar: false
 directories:
   output: dist
@@ -19,12 +19,19 @@ files:
   - "!dist/**/*"
   - "!.kiro/**/*"
   - "!.vscode/**/*"
-  - "!shop.db"
+  - "!*.db"
+  - "!*.db-shm"
+  - "!*.db-wal"
 win:
-  target:
-    - target: portable
-      arch:
-        - x64
+  target: nsis
   verifyUpdateCodeSignature: false
-portable:
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
   artifactName: "${productName} Setup.${ext}"
+publish:
+  provider: github
+  owner: Adam07253
+  repo: punchiri-pos

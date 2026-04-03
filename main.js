@@ -1,9 +1,53 @@
-const { app, BrowserWindow, globalShortcut } = require('electron');
+const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const { spawn } = require('child_process');
 const path = require('path');
 
 let mainWindow;
 let serverProcess;
+
+// Configure auto-updater
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
+
+// Auto-update event handlers
+autoUpdater.on('checking-for-update', () => {
+  console.log('Checking for updates...');
+});
+
+autoUpdater.on('update-available', (info) => {
+  console.log('Update available:', info.version);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', 'Downloading update...');
+  }
+});
+
+autoUpdater.on('update-not-available', () => {
+  console.log('No updates available');
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  const message = `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}%`;
+  console.log(message);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', `Downloading update... ${Math.round(progressObj.percent)}%`);
+  }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('Update downloaded:', info.version);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', 'Update ready. Restarting...');
+  }
+  // Install update after 3 seconds
+  setTimeout(() => {
+    autoUpdater.quitAndInstall(false, true);
+  }, 3000);
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('Update error:', err);
+});
 
 // Prevent multiple instances
 const gotTheLock = app.requestSingleInstanceLock();
@@ -58,6 +102,14 @@ function createWindow() {
       }
     }
   });
+
+  // Prevent window close until backup is complete
+  mainWindow.on('close', (event) => {
+    event.preventDefault();
+    
+    // Send message to renderer to show backup confirmation
+    mainWindow.webContents.send('request-close-confirmation');
+  });
 }
 
 app.whenReady().then(() => {
@@ -93,8 +145,8 @@ app.whenReady().then(() => {
       // No external "node" command needed
       serverProcess = spawn(process.execPath, [serverPath], {
         cwd: app.isPackaged ? path.join(process.resourcesPath, 'app') : __dirname,
-        windowsHide: true, // Hide console in production
-        stdio: 'ignore', // Ignore output in production
+        windowsHide: app.isPackaged, // Hide console only in production
+        stdio: app.isPackaged ? 'ignore' : 'inherit', // Show logs in development
         env: { 
           ...process.env, 
           ELECTRON_RUN_AS_NODE: '1' // Makes Electron act as Node.js
@@ -139,6 +191,29 @@ app.whenReady().then(() => {
 
     setTimeout(waitForServer, 1000);
   });
+});
+
+// Check for updates after app is ready
+app.whenReady().then(() => {
+  // Check for updates 5 seconds after launch
+  setTimeout(() => {
+    if (!app.isPackaged) {
+      console.log('Development mode - skipping update check');
+      return;
+    }
+    console.log('Checking for updates...');
+    autoUpdater.checkForUpdates().catch(err => {
+      console.error('Failed to check for updates:', err);
+    });
+  }, 5000);
+});
+
+// IPC handler to allow closing after backup confirmation
+ipcMain.on('allow-close', () => {
+  if (mainWindow) {
+    mainWindow.removeAllListeners('close');
+    mainWindow.close();
+  }
 });
 
 app.on('before-quit', () => {

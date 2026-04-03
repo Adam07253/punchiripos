@@ -1370,7 +1370,7 @@
                     setTodayPurchaseDate();
                     $("name").focus();
 
-                    // Reload existing names
+                    // Reload existing names and stats
                     await loadExisting();
                 } else {
                     alert("⚠️ Unexpected response: " + (bodyText || JSON.stringify(bodyJson)));
@@ -1380,8 +1380,8 @@
                 alert("❌ Network error: " + err.message);
                 console.error(err);
             } finally {
-                // Restore button
-                saveBtn.innerHTML = originalHTML;
+                // Restore button properly
+                saveBtn.textContent = originalText;
                 saveBtn.disabled = false;
             }
         };
@@ -1470,6 +1470,11 @@
             window.location.href = "out-of-stock.html";
         }
     </script>
+    
+    <!-- Alert Fix - Prevents input lock after validation popups -->
+    <script src="nonBlockingUI.js"></script>
+    <!-- Global Focus Fix - Hard fix for UI freeze -->
+    <script src="globalFocusFix.js?v=2"></script>
 </body>
 
 </html>

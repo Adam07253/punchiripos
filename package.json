@@ -1,12 +1,47 @@
 {
-  "name": "shopsystem",
-  "version": "2.1.0",
+  "name": "punchiri-pos",
+  "version": "1.0.0",
+  "description": "Punchiri POS - Professional Point of Sale System",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "build": "electron-builder",
     "dist": "electron-builder",
     "electron-build": "electron-builder",
     "package": "electron-packager . \"Punchiri Billing System\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"^/(dist|backups|.git|.kiro|.vscode)\" --prune=false"
+  },
+  "build": {
+    "appId": "com.punchiri.pos",
+    "productName": "Punchiri POS",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/.cache",
+      "!backups/**/*",
+      "!dist/**/*",
+      "!.kiro/**/*",
+      "!.vscode/**/*",
+      "!*.db"
+    ],
+    "win": {
+      "target": "nsis",
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Adam07253",
+        "repo": "punchiri-pos"
+      }
+    ]
   },
   "devDependencies": {
     "electron": "^40.4.1",
@@ -17,6 +52,7 @@
     "@aws-sdk/client-s3": "^3.1011.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
+    "electron-updater": "^6.8.3",
     "express": "^5.2.1",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^4.2.1",

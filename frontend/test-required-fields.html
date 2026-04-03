@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Required Fields Popup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .test-form {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        label.required::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        input.error {
+            border-color: #dc3545;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .test-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .test-buttons button {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .info-box strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Required Fields Popup</h1>
+        <p class="subtitle">Test validation popups for required fields</p>
+        
+        <div class="info-box">
+            <strong>✓ Popup System Loaded!</strong><br>
+            All alert() calls now use non-blocking popups. Try the tests below.
+        </div>
+        
+        <!-- Test 1: Simple Form -->
+        <div class="test-section">
+            <h3>Test 1: Product Form (Like Add Product Page)</h3>
+            <form class="test-form" id="productForm" onsubmit="return validateProductForm(event)">
+                <div class="form-group">
+                    <label class="required">Product Name</label>
+                    <input type="text" id="productName" placeholder="Enter product name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">Unit Type</label>
+                    <select id="unit">
+                        <option value="">-- Select Unit --</option>
+                        <option value="kg">Kilogram (kg)</option>
+                        <option value="pc">Pieces (pc)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">Quantity</label>
+                    <input type="number" id="quantity" placeholder="Enter quantity" min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">Price</label>
+                    <input type="number" id="price" placeholder="Enter price" min="0.01" step="0.01">
+                </div>
+                
+                <button type="submit">Submit Form</button>
+                <div id="status1" class="status"></div>
+            </form>
+        </div>
+        
+        <!-- Test 2: Individual Field Tests -->
+        <div class="test-section">
+            <h3>Test 2: Individual Field Validations</h3>
+            <div class="test-buttons">
+                <button onclick="testEmptyField()">Test Empty Field</button>
+                <button onclick="testInvalidNumber()">Test Invalid Number</button>
+                <button onclick="testNoSelection()">Test No Selection</button>
+            </div>
+            <div id="status2" class="status"></div>
+        </div>
+        
+        <!-- Test 3: Multiple Validations -->
+        <div class="test-section">
+            <h3>Test 3: Multiple Validation Errors</h3>
+            <div class="test-buttons">
+                <button onclick="testMultipleErrors()">Trigger 3 Errors in Sequence</button>
+            </div>
+            <div id="status3" class="status"></div>
+        </div>
+        
+        <!-- Test 4: Focus Restoration -->
+        <div class="test-section">
+            <h3>Test 4: Focus Restoration After Popup</h3>
+            <input type="text" id="focusTest" placeholder="Click here, then click button below">
+            <br><br>
+            <button onclick="testFocusRestore()">Show Popup (Focus Should Return)</button>
+            <div id="status4" class="status"></div>
+        </div>
+    </div>
+    
+    <!-- Load non-blocking UI system -->
+    <script src="nonBlockingUI.js"></script>
+    
+    <script>
+        // Test 1: Product Form Validation
+        async function validateProductForm(event) {
+            event.preventDefault();
+            
+            const productName = document.getElementById('productName').value.trim();
+            const unit = document.getElementById('unit').value;
+            const quantity = document.getElementById('quantity').value;
+            const price = document.getElementById('price').value;
+            
+            const status = document.getElementById('status1');
+            
+            // Validate product name
+            if (!productName) {
+                await alert("Product Name is required!");
+                document.getElementById('productName').focus();
+                return false;
+            }
+            
+            // Validate unit
+            if (!unit) {
+                await alert("Please select a unit (kg or pieces)!");
+                document.getElementById('unit').focus();
+                return false;
+            }
+            
+            // Validate quantity
+            if (!quantity || Number(quantity) <= 0) {
+                await alert("Quantity must be greater than 0!");
+                document.getElementById('quantity').focus();
+                return false;
+            }
+            
+            // Validate price
+            if (!price || Number(price) <= 0) {
+                await alert("Price must be greater than 0!");
+                document.getElementById('price').focus();
+                return false;
+            }
+            
+            // All validations passed
+            status.className = 'status success';
+            status.style.display = 'block';
+            status.textContent = '✅ All validations passed! Form is valid.';
+            
+            return false; // Prevent actual submission
+        }
+        
+        // Test 2: Individual Field Tests
+        async function testEmptyField() {
+            await alert("Product Name is required!");
+            showStatus('status2', 'success', '✅ Empty field popup shown!');
+        }
+        
+        async function testInvalidNumber() {
+            await alert("Quantity must be greater than 0!");
+            showStatus('status2', 'success', '✅ Invalid number popup shown!');
+        }
+        
+        async function testNoSelection() {
+            await alert("Please select a unit (kg or pieces)!");
+            showStatus('status2', 'success', '✅ No selection popup shown!');
+        }
+        
+        // Test 3: Multiple Errors
+        async function testMultipleErrors() {
+            const status = document.getElementById('status3');
+            status.className = 'status';
+            status.style.display = 'block';
+            status.textContent = 'Showing error 1 of 3...';
+            
+            await alert("Product Name is required!");
+            status.textContent = 'Showing error 2 of 3...';
+            
+            await alert("Please select a unit (kg or pieces)!");
+            status.textContent = 'Showing error 3 of 3...';
+            
+            await alert("Quantity must be greater than 0!");
+            
+            status.className = 'status success';
+            status.textContent = '✅ All 3 popups shown successfully!';
+        }
+        
+        // Test 4: Focus Restoration
+        async function testFocusRestore() {
+            const input = document.getElementById('focusTest');
+            const status = document.getElementById('status4');
+            
+            input.focus();
+            
+            await alert("After closing this, focus should return to the input field!");
+            
+            setTimeout(() => {
+                if (document.activeElement === input) {
+                    showStatus('status4', 'success', '✅ Focus restored correctly!');
+                } else {
+                    showStatus('status4', 'error', '❌ Focus not restored');
+                }
+            }, 200);
+        }
+        
+        // Helper function
+        function showStatus(id, type, message) {
+            const status = document.getElementById(id);
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            status.textContent = message;
+        }
+        
+        // Log when loaded
+        console.log('✓ Test page loaded');
+        console.log('✓ alert() type:', typeof window.alert);
+        console.log('✓ nbAlert() type:', typeof window.nbAlert);
+    </script>
+</body>
+</html>

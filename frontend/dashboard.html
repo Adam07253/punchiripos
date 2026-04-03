@@ -391,9 +391,131 @@ function refreshCurrentPage() {
 
 // Close Store - Trigger Cloudflare R2 Backup
 async function closeStore() {
-  if (!confirm('Are you sure you want to close the store? This will create a backup and upload it to Cloudflare.')) {
-    return;
-  }
+  showBackupConfirmationModal();
+}
+
+// Show backup confirmation modal
+function showBackupConfirmationModal() {
+  const modal = document.createElement('div');
+  modal.id = 'backupConfirmModal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+  `;
+  
+  modal.innerHTML = `
+    <div style="
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      position: relative;
+    ">
+      <button onclick="cancelBackup()" style="
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: transparent;
+        border: none;
+        font-size: 24px;
+        color: #94a3b8;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.2s;
+      " onmouseover="this.style.background='#f1f5f9'; this.style.color='#475569';" onmouseout="this.style.background='transparent'; this.style.color='#94a3b8';">×</button>
+      
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 48px; margin-bottom: 10px;">☁️</div>
+        <h2 style="margin: 0; color: #1e293b; font-size: 24px;">Close Store & Backup</h2>
+      </div>
+      
+      <p style="color: #64748b; text-align: center; margin-bottom: 30px; line-height: 1.6;">
+        This will create a backup of your database and upload it to Cloudflare R2 cloud storage. 
+        After backup, you will be logged out.
+      </p>
+      
+      <div id="backupStatus" style="
+        background: #f1f5f9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+      ">
+        <div id="backupStatusText" style="color: #475569; text-align: center;"></div>
+      </div>
+      
+      <div style="display: flex; gap: 12px;">
+        <button onclick="cancelBackup()" id="cancelBtn" style="
+          flex: 1;
+          padding: 12px;
+          background: #e2e8f0;
+          color: #475569;
+          border: none;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        " onmouseover="this.style.background='#cbd5e1';" onmouseout="this.style.background='#e2e8f0';">Cancel</button>
+        
+        <button onclick="performBackupAndLogout()" id="confirmBtn" style="
+          flex: 1;
+          padding: 12px;
+          background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(37, 99, 235, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">Backup & Logout</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+}
+
+// Cancel backup
+function cancelBackup() {
+  const modal = document.getElementById('backupConfirmModal');
+  if (modal) modal.remove();
+}
+
+// Perform backup and logout
+async function performBackupAndLogout() {
+  const statusDiv = document.getElementById('backupStatus');
+  const statusText = document.getElementById('backupStatusText');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  
+  // Disable buttons
+  confirmBtn.disabled = true;
+  cancelBtn.disabled = true;
+  confirmBtn.style.opacity = '0.5';
+  cancelBtn.style.opacity = '0.5';
+  confirmBtn.style.cursor = 'not-allowed';
+  cancelBtn.style.cursor = 'not-allowed';
+  
+  // Show status
+  statusDiv.style.display = 'block';
+  statusText.textContent = '⏳ Creating backup...';
   
   try {
     const response = await fetch('http://localhost:3000/api/store-closing-backup', {
@@ -406,21 +528,68 @@ async function closeStore() {
     const result = await response.json();
     
     if (result.success) {
-      alert('✓ Backup uploaded successfully\n\nFilename: ' + result.filename + '\nLocation: ' + result.r2Key);
+      statusDiv.style.background = '#d1fae5';
+      statusText.style.color = '#065f46';
+      statusText.innerHTML = `
+        ✓ Backup uploaded successfully<br>
+        <small style="font-size: 13px;">File: ${result.filename}</small><br>
+        <small style="font-size: 13px;">Location: ${result.r2Key}</small>
+      `;
       
-      // After successful backup, show logout popup
-      if (confirm('Do you want to logout?')) {
+      // Change buttons to "Close" button
+      cancelBtn.style.display = 'none';
+      confirmBtn.textContent = 'Close & Logout';
+      confirmBtn.disabled = false;
+      confirmBtn.style.opacity = '1';
+      confirmBtn.style.cursor = 'pointer';
+      confirmBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+      confirmBtn.onclick = function() {
         sessionStorage.removeItem('adminLoggedIn');
         sessionStorage.removeItem('adminUsername');
-        window.location.href = '/login.html';
-      }
+        
+        // Tell Electron it's safe to close
+        if (window.require) {
+          const { ipcRenderer } = window.require('electron');
+          ipcRenderer.send('allow-close');
+        } else {
+          window.location.href = '/login.html';
+        }
+      };
     } else {
-      alert('✗ Backup failed\n\nError: ' + (result.error || result.message));
+      statusDiv.style.background = '#fee2e2';
+      statusText.style.color = '#991b1b';
+      statusText.textContent = '✗ Backup failed: ' + (result.error || result.message);
+      
+      // Re-enable buttons
+      confirmBtn.disabled = false;
+      cancelBtn.disabled = false;
+      confirmBtn.style.opacity = '1';
+      cancelBtn.style.opacity = '1';
+      confirmBtn.style.cursor = 'pointer';
+      cancelBtn.style.cursor = 'pointer';
     }
   } catch (error) {
     console.error('Store closing backup error:', error);
-    alert('✗ Backup failed\n\nError: ' + error.message);
+    statusDiv.style.background = '#fee2e2';
+    statusText.style.color = '#991b1b';
+    statusText.textContent = '✗ Backup failed: ' + error.message;
+    
+    // Re-enable buttons
+    confirmBtn.disabled = false;
+    cancelBtn.disabled = false;
+    confirmBtn.style.opacity = '1';
+    cancelBtn.style.opacity = '1';
+    confirmBtn.style.cursor = 'pointer';
+    cancelBtn.style.cursor = 'pointer';
   }
+}
+
+// Listen for window close request from Electron
+if (window.require) {
+  const { ipcRenderer } = window.require('electron');
+  ipcRenderer.on('request-close-confirmation', () => {
+    showBackupConfirmationModal();
+  });
 }
   </script>
 
@@ -456,5 +625,10 @@ async function closeStore() {
       });
     }
   </script>
+  
+  <!-- Alert Fix - Prevents input lock after validation popups -->
+  <script src="nonBlockingUI.js"></script>
+    <!-- Global Focus Fix - Hard fix for UI freeze -->
+  <script src="globalFocusFix.js?v=2"></script>
 </body>
 </html>
